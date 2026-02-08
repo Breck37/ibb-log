@@ -14,7 +14,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ibblog.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "IBB Log needs camera access to take workout photos.",
+        "NSPhotoLibraryUsageDescription": "IBB Log needs photo library access to attach workout images.",
+        "NSMicrophoneUsageDescription": "IBB Log needs microphone access for voice-to-text comments.",
+        "NSSpeechRecognitionUsageDescription": "IBB Log uses speech recognition for voice-to-text comments.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +30,13 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ibblog.app",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -34,6 +48,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5bf887e1-ee59-4416-b443-8cfc8a7e4896"
+      }
+    },
+    "owner": "bdotdev"
   }
 }
