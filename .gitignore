@@ -40,5 +40,8 @@ yarn-error.*
 /ios
 /android
 
+# Supabase
+supabase/.temp/
+
 /.claude
 AGENTS.md
