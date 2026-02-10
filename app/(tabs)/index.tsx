@@ -38,7 +38,7 @@ export default function FeedScreen() {
         contentContainerClassName="p-4"
         ListEmptyComponent={
           <View className="items-center py-20">
-            <Text className="mb-2 text-lg font-semibold text-gray-600">
+            <Text className="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">
               No groups yet
             </Text>
             <Text className="text-gray-400">
@@ -47,7 +47,16 @@ export default function FeedScreen() {
           </View>
         }
         ListHeaderComponent={
-          <View className="mb-4 flex-row gap-3">
+          <View className="mb-4 gap-4">
+            <View className="items-center">
+              <Text className="text-2xl font-bold dark:text-white">
+                IBB Log
+              </Text>
+              <Text className="text-sm text-gray-500">
+                Track workouts. Stay accountable.
+              </Text>
+            </View>
+            <View className="flex-row gap-3">
             <Link href="/group/create" asChild>
               <Pressable className="flex-1 rounded-lg bg-blue-600 py-3 active:bg-blue-700">
                 <Text className="text-center font-semibold text-white">
@@ -62,6 +71,7 @@ export default function FeedScreen() {
                 </Text>
               </Pressable>
             </Link>
+            </View>
           </View>
         }
         renderItem={({ item }) => (

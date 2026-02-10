@@ -40,9 +40,7 @@ export default function TabLayout() {
         name="leaderboard"
         options={{
           title: "Leaderboard",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="trophy" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabBarIcon name="trophy" color={color} />,
         }}
       />
       <Tabs.Screen

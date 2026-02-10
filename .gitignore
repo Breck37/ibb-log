@@ -42,3 +42,6 @@ yarn-error.*
 
 # Supabase
 supabase/.temp/
+
+/.claude
+AGENTS.md
