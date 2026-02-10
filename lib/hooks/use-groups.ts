@@ -11,18 +11,9 @@ export function useMyGroups() {
   return useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
-      const { data: memberships, error: memberError } = await supabase
-        .from("group_members")
-        .select("group_id");
-
-      if (memberError) throw memberError;
-      if (!memberships.length) return [] as Group[];
-
-      const groupIds = memberships.map((m) => m.group_id);
       const { data, error } = await supabase
         .from("groups")
         .select("*")
-        .in("id", groupIds)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -44,6 +35,7 @@ export function useCreateGroup() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      console.log("!", { user });
       if (!user) throw new Error("Not authenticated");
 
       const { data: group, error: groupError } = await supabase
@@ -51,7 +43,7 @@ export function useCreateGroup() {
         .insert({ ...input, created_by: user.id })
         .select()
         .single();
-
+      console.log({ group, groupError });
       if (groupError) throw groupError;
 
       const { error: memberError } = await supabase

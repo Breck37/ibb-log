@@ -63,3 +63,42 @@ export async function uploadMultipleImages(
   );
   return urls;
 }
+
+export async function pickSingleImage(): Promise<ImagePicker.ImagePickerAsset | null> {
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    allowsMultipleSelection: false,
+    quality: 1,
+  });
+
+  if (result.canceled || !result.assets.length) return null;
+  return result.assets[0];
+}
+
+export async function uploadAvatar(
+  userId: string,
+  imageUri: string,
+): Promise<string> {
+  const compressedUri = await compressImage(imageUri);
+
+  const fileName = `${userId}/avatar-${Date.now()}.jpg`;
+
+  const response = await fetch(compressedUri);
+  const blob = await response.blob();
+  const arrayBuffer = await new Response(blob).arrayBuffer();
+
+  const { error } = await supabase.storage
+    .from("avatars")
+    .upload(fileName, arrayBuffer, {
+      contentType: "image/jpeg",
+      upsert: true,
+    });
+
+  if (error) throw error;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+  return publicUrl;
+}
