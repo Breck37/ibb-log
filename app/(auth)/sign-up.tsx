@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -14,6 +14,7 @@ import { useAuth } from "@/providers/auth-provider";
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +29,9 @@ export default function SignUpScreen() {
     setLoading(true);
     try {
       await signUp(email, password, username);
-      Alert.alert("Success", "Check your email for a confirmation link!");
+      Alert.alert("Success", "Check your email for a confirmation link!", [
+        { text: "OK", onPress: () => router.replace("/(auth)/sign-in") },
+      ]);
     } catch (error) {
       Alert.alert(
         "Error",
@@ -45,7 +48,8 @@ export default function SignUpScreen() {
       className="flex-1"
     >
       <View className="flex-1 justify-center px-8">
-        <Text className="mb-8 text-center text-3xl font-bold">
+        <Text className="mb-2 text-center text-3xl font-bold">IBB Log</Text>
+        <Text className="mb-8 text-center text-lg text-gray-400">
           Create Account
         </Text>
 
