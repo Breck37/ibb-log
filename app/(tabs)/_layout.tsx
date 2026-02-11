@@ -1,5 +1,5 @@
-import { House, PlusCircle, Trophy, User } from 'phosphor-react-native';
 import { Tabs } from 'expo-router';
+import { House, PlusCircle, Trophy, User, UsersThree } from 'phosphor-react-native';
 import { useColorScheme } from 'react-native';
 
 import Colors from '@/constants/Colors';
@@ -27,6 +27,15 @@ export default function TabLayout() {
           title: 'Feed',
           tabBarIcon: ({ color }) => (
             <House size={24} color={color} weight="regular" />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="groups"
+        options={{
+          title: 'Groups',
+          tabBarIcon: ({ color }) => (
+            <UsersThree size={24} color={color} weight="regular" />
           ),
         }}
       />
