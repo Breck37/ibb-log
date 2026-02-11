@@ -10,10 +10,10 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
+import { Input } from "@/components/ui/Input";
 import { WorkoutCard } from "@/components/workoutCard";
 import { useMyGroups } from "@/lib/hooks/use-groups";
 import { useCreateWorkout, useMyWorkouts } from "@/lib/hooks/use-workouts";
@@ -40,7 +40,7 @@ export default function LogScreen() {
   const toggleGroup = (groupId: string) => {
     setSelectedGroupIds((prev) => {
       // Initialize from all groups if first interaction
-      const current = prev.length > 0 ? prev : groups?.map((g) => g.id) ?? [];
+      const current = prev.length > 0 ? prev : (groups?.map((g) => g.id) ?? []);
       return current.includes(groupId)
         ? current.filter((id) => id !== groupId)
         : [...current, groupId];
@@ -147,8 +147,8 @@ export default function LogScreen() {
         <Text className="mb-2 font-medium dark:text-gray-300">
           Duration (minutes)
         </Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="45"
           value={duration}
           onChangeText={setDuration}
@@ -156,8 +156,8 @@ export default function LogScreen() {
         />
 
         <Text className="mb-2 font-medium dark:text-gray-300">Title</Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="e.g. Push day: bench, OHP, dips..."
           value={title}
           onChangeText={setTitle}
@@ -166,8 +166,8 @@ export default function LogScreen() {
         <Text className="mb-2 font-medium dark:text-gray-300">
           Description (optional)
         </Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="How did it go?"
           value={description}
           onChangeText={setDescription}
@@ -197,11 +197,7 @@ export default function LogScreen() {
           </Pressable>
         </View>
 
-        <Pressable
-          className="rounded-lg bg-blue-600 py-3 active:bg-blue-700"
-          onPress={handleSubmit}
-          disabled={createWorkout.isPending}
-        >
+        <Pressable onPress={handleSubmit} disabled={createWorkout.isPending}>
           <Text className="text-center text-base font-semibold text-white">
             {createWorkout.isPending ? "Logging..." : "Log Workout"}
           </Text>

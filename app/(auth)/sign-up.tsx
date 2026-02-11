@@ -6,10 +6,11 @@ import {
   Platform,
   Pressable,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function SignUpScreen() {
@@ -53,8 +54,8 @@ export default function SignUpScreen() {
           Create Account
         </Text>
 
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
@@ -62,8 +63,8 @@ export default function SignUpScreen() {
           textContentType="username"
         />
 
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -72,8 +73,8 @@ export default function SignUpScreen() {
           textContentType="emailAddress"
         />
 
-        <TextInput
-          className="mb-6 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-6"
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
@@ -81,15 +82,12 @@ export default function SignUpScreen() {
           textContentType="newPassword"
         />
 
-        <Pressable
-          className="mb-4 rounded-lg bg-blue-600 py-3 active:bg-blue-700"
+        <Button
+          className="mb-4"
+          title="Sign Up"
           onPress={handleSignUp}
-          disabled={loading}
-        >
-          <Text className="text-center text-base font-semibold text-white">
-            {loading ? "Creating account..." : "Sign Up"}
-          </Text>
-        </Pressable>
+          loading={loading}
+        />
 
         <Link href="/(auth)/sign-in" asChild>
           <Pressable>

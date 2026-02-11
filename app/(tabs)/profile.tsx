@@ -1,5 +1,6 @@
+import { Button, Input } from "@/components/ui/";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useState } from "react";
 import {
@@ -9,7 +10,6 @@ import {
   Image,
   Pressable,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
@@ -167,8 +167,8 @@ export default function ProfileScreen() {
               <Text className="mb-1 text-xs font-medium text-gray-500">
                 Display Name
               </Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-600 dark:text-white"
+              <Input
+                size="sm"
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Display name"
@@ -179,8 +179,8 @@ export default function ProfileScreen() {
               <Text className="mb-1 text-xs font-medium text-gray-500">
                 Username
               </Text>
-              <TextInput
-                className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-600 dark:text-white"
+              <Input
+                size="sm"
                 value={username}
                 onChangeText={setUsername}
                 placeholder="Username"
@@ -189,23 +189,18 @@ export default function ProfileScreen() {
               />
             </View>
             <View className="flex-row gap-3">
-              <Pressable
-                className="flex-1 rounded-lg border border-gray-300 py-2.5 active:bg-gray-100"
+              <Button
+                className="flex-1"
+                variant="outline"
+                title="Cancel"
                 onPress={() => setIsEditing(false)}
-              >
-                <Text className="text-center font-medium text-gray-600">
-                  Cancel
-                </Text>
-              </Pressable>
-              <Pressable
-                className="flex-1 rounded-lg bg-blue-600 py-2.5 active:bg-blue-700"
+              />
+              <Button
+                className="flex-1"
+                title="Save"
                 onPress={handleSave}
-                disabled={isSaving}
-              >
-                <Text className="text-center font-medium text-white">
-                  {isSaving ? "Saving..." : "Save"}
-                </Text>
-              </Pressable>
+                loading={isSaving}
+              />
             </View>
           </View>
         ) : (
@@ -222,14 +217,13 @@ export default function ProfileScreen() {
                 Member since {memberSince}
               </Text>
             )}
-            <Pressable
-              className="mt-3 rounded-lg border border-blue-600 px-6 py-2 active:bg-blue-50"
+            <Button
+              className="mt-3"
+              variant="outline"
+              size="sm"
+              title="Edit Profile"
               onPress={handleStartEditing}
-            >
-              <Text className="text-center font-medium text-blue-600">
-                Edit Profile
-              </Text>
-            </Pressable>
+            />
           </>
         )}
       </View>
@@ -304,13 +298,7 @@ export default function ProfileScreen() {
   );
 }
 
-function StatTile({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function StatTile({ label, value }: { label: string; value: string | number }) {
   return (
     <View className="min-w-[22%] flex-1 items-center rounded-lg bg-white p-3 shadow-sm dark:bg-gray-800">
       <Text className="text-lg font-bold text-blue-600 dark:text-blue-400">

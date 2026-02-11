@@ -6,10 +6,11 @@ import {
   Platform,
   Pressable,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function SignInScreen() {
@@ -45,8 +46,8 @@ export default function SignInScreen() {
       <View className="flex-1 justify-center px-8">
         <Text className="mb-8 text-center text-3xl font-bold">IBB Log</Text>
 
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -55,8 +56,8 @@ export default function SignInScreen() {
           textContentType="emailAddress"
         />
 
-        <TextInput
-          className="mb-6 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-6"
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
@@ -64,15 +65,12 @@ export default function SignInScreen() {
           textContentType="password"
         />
 
-        <Pressable
-          className="mb-4 rounded-lg bg-blue-600 py-3 active:bg-blue-700"
+        <Button
+          className="mb-4"
+          title="Sign In"
           onPress={handleSignIn}
-          disabled={loading}
-        >
-          <Text className="text-center text-base font-semibold text-white">
-            {loading ? "Signing in..." : "Sign In"}
-          </Text>
-        </Pressable>
+          loading={loading}
+        />
 
         <Link href="/(auth)/sign-up" asChild>
           <Pressable>
