@@ -98,3 +98,87 @@ export function useGroupWorkouts(groupId: string) {
     enabled: !!groupId,
   });
 }
+
+export type FeedWorkout = {
+  id: string;
+  duration_minutes: number;
+  title: string;
+  description: string | null;
+  image_urls: string[];
+  created_at: string;
+  is_qualified: boolean;
+  groupName: string;
+  profiles: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
+};
+
+export function useFeedWorkouts() {
+  return useQuery({
+    queryKey: ["workouts", "feed"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("group_workouts")
+        .select(
+          "is_qualified, groups(name), workouts(*, profiles(username, display_name, avatar_url))",
+        )
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row) => ({
+        id: row.workouts!.id,
+        duration_minutes: row.workouts!.duration_minutes,
+        title: row.workouts!.title,
+        description: row.workouts!.description,
+        image_urls: row.workouts!.image_urls ?? [],
+        created_at: row.workouts!.created_at,
+        is_qualified: row.is_qualified,
+        groupName: row.groups?.name ?? "",
+        profiles: row.workouts!.profiles,
+      })) satisfies FeedWorkout[];
+    },
+  });
+}
+
+export function useMyWorkouts(limit?: number) {
+  return useQuery({
+    queryKey: ["workouts", "mine", limit],
+    queryFn: async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      let query = supabase
+        .from("workouts")
+        .select("*, group_workouts(is_qualified, groups(name))")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return (data ?? []).map((row) => {
+        const firstGw = row.group_workouts?.[0];
+        return {
+          id: row.id,
+          duration_minutes: row.duration_minutes,
+          title: row.title,
+          description: row.description,
+          image_urls: row.image_urls ?? [],
+          created_at: row.created_at,
+          is_qualified: firstGw?.is_qualified ?? false,
+          groupName: firstGw?.groups?.name ?? "",
+          profiles: null,
+        } satisfies FeedWorkout;
+      });
+    },
+  });
+}

@@ -5,15 +5,17 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
 } from "react-native";
 
+import { WorkoutCard } from "@/components/workoutCard";
 import { useMyGroups } from "@/lib/hooks/use-groups";
+import { useMyWorkouts } from "@/lib/hooks/use-workouts";
 import { pickSingleImage, uploadAvatar } from "@/lib/services/image-upload";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/auth-provider";
@@ -44,6 +46,7 @@ export default function ProfileScreen() {
   });
 
   const { data: groups } = useMyGroups();
+  const { data: workouts } = useMyWorkouts();
 
   const handleStartEditing = () => {
     setDisplayName(profile?.display_name ?? "");
@@ -126,8 +129,8 @@ export default function ProfileScreen() {
       })
     : null;
 
-  return (
-    <ScrollView className="flex-1" contentContainerClassName="p-4">
+  const profileHeader = (
+    <>
       <View className="mb-6 items-center">
         <Pressable onPress={handleAvatarPress} className="mb-3">
           {isUploadingAvatar ? (
@@ -247,11 +250,33 @@ export default function ProfileScreen() {
       )}
 
       <Pressable
-        className="rounded-lg border border-red-300 py-3 active:bg-red-50"
+        className="mb-6 rounded-lg border border-red-300 py-3 active:bg-red-50"
         onPress={handleSignOut}
       >
         <Text className="text-center font-medium text-red-600">Sign Out</Text>
       </Pressable>
-    </ScrollView>
+
+      {workouts && workouts.length > 0 && (
+        <Text className="mb-2 text-sm font-semibold text-gray-500">
+          Your Workouts
+        </Text>
+      )}
+    </>
+  );
+
+  return (
+    <FlatList
+      className="flex-1"
+      contentContainerClassName="p-4"
+      data={workouts ?? []}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={profileHeader}
+      ListEmptyComponent={
+        <View className="items-center py-8">
+          <Text className="text-gray-400">No workouts yet</Text>
+        </View>
+      }
+      renderItem={({ item }) => <WorkoutCard workout={item} />}
+    />
   );
 }

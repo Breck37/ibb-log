@@ -14,14 +14,16 @@ import {
   View,
 } from "react-native";
 
+import { WorkoutCard } from "@/components/workoutCard";
 import { useMyGroups } from "@/lib/hooks/use-groups";
-import { useCreateWorkout } from "@/lib/hooks/use-workouts";
+import { useCreateWorkout, useMyWorkouts } from "@/lib/hooks/use-workouts";
 import { pickImages } from "@/lib/services/image-upload";
 
 export default function LogScreen() {
   const router = useRouter();
   const { data: groups } = useMyGroups();
   const createWorkout = useCreateWorkout();
+  const { data: recentWorkouts } = useMyWorkouts(5);
 
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const [duration, setDuration] = useState("");
@@ -204,6 +206,17 @@ export default function LogScreen() {
             {createWorkout.isPending ? "Logging..." : "Log Workout"}
           </Text>
         </Pressable>
+
+        {recentWorkouts && recentWorkouts.length > 0 && (
+          <View className="mt-8">
+            <Text className="mb-3 text-sm font-semibold text-gray-500">
+              Recent Workouts
+            </Text>
+            {recentWorkouts.map((workout) => (
+              <WorkoutCard key={workout.id} workout={workout} />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
