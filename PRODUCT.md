@@ -49,7 +49,35 @@ A group workout accountability app where users track workouts, post to groups, a
 #### Post Labels
 
 - Icon label for didn't meet group configuration "qualifications" (e.g. didn't meet workout minimum)
-- Number icon label for workout of week # (1st of week, 2nd of week, 3rd, etc.)
+- Number icon label for qualifying workout of the week (#1, #2, #3, etc.)
+  - Only qualifying workouts receive the `#` label
+  - Non-qualifying workouts display the "didn't qualify" icon instead
+
+#### Weekly Tracking
+
+- Track how many workouts a user has completed in the current week per group
+- Track how many workouts remain to meet the group's qualification threshold
+- Track time remaining in the current week
+- **End-of-Week Report**: Per-group report pushed as a push notification to all group members on Monday morning
+  - Summarizes the previous week's workouts for each member
+  - Shows who qualified and who didn't
+
+#### Achievements
+
+- Track cumulative workout milestones: 10, 25, 50, 100, 250, 500, 1,000+
+- On milestone hit:
+  - Personal push notification to the user
+  - Group notification to all groups the user belongs to (e.g. "Brent just hit 100 workouts!")
+- Achievements are visible on the user's profile
+
+### Current Week Stats Widget
+
+- Displayed on the Feed screen and User Profile screen
+- Shows:
+  - Time remaining in the current week
+  - Workouts completed this week
+  - Workouts remaining to qualify
+- Serves as a persistent reminder of the user's accountability status
 
 ### Feed
 
@@ -68,6 +96,8 @@ A group workout accountability app where users track workouts, post to groups, a
 - Group members receive push notifications for:
   - Chat messages
   - Workout posts
+  - Weekly report (Monday morning, per-group)
+  - Achievement milestones (personal + group)
   - Reminders (TBD)
   - Opt-in daily workout related motivation message (stretch goal, could be AI generated)
 
@@ -78,6 +108,8 @@ A group workout accountability app where users track workouts, post to groups, a
 - Update profile image/avatar
 - Delete account
 - Add "bio" (short personal description)
+- Current week stats widget
+- Achievements display (milestone badges/counts)
 
 ## User Flows
 
@@ -115,3 +147,24 @@ A group workout accountability app where users track workouts, post to groups, a
 | `reactions` | Emoji reactions on group_workouts (per-group) |
 | `comments` | Threaded comments on group_workouts (per-group) |
 | `group_messages` | Group chat messages |
+| `achievements` | User milestone records (workout count thresholds reached) |
+| `weekly_reports` | Per-group weekly summaries: member qualification status, workout counts |
+
+## Deployment & Release
+
+### Platform
+
+- **iOS only** (Android support TBD / deferred)
+
+### Expo / TestFlight Pipeline
+
+- App is built with Expo
+- Use EAS Build for creating native iOS builds
+- Distribute via TestFlight for beta testing
+- OTA updates via EAS Update for non-native changes
+
+### Release Milestones
+
+- **Alpha**: Core workout tracking, group creation, feed, push notifications
+- **Beta (TestFlight)**: Weekly reports, achievements, stats widget, polish
+- **v1.0**: Public launch with App Store submission
