@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 
+import { Button } from "@/components/ui/Button";
 import { useMyGroups } from "@/lib/hooks/use-groups";
 
 export default function FeedScreen() {
@@ -58,18 +59,10 @@ export default function FeedScreen() {
             </View>
             <View className="flex-row gap-3">
             <Link href="/group/create" asChild>
-              <Pressable className="flex-1 rounded-lg bg-blue-600 py-3 active:bg-blue-700">
-                <Text className="text-center font-semibold text-white">
-                  Create Group
-                </Text>
-              </Pressable>
+              <Button className="flex-1" title="Create Group" />
             </Link>
             <Link href="/group/join" asChild>
-              <Pressable className="flex-1 rounded-lg border border-blue-600 py-3 active:bg-blue-50">
-                <Text className="text-center font-semibold text-blue-600">
-                  Join Group
-                </Text>
-              </Pressable>
+              <Button className="flex-1" variant="outline" title="Join Group" />
             </Link>
             </View>
           </View>

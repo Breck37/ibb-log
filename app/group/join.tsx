@@ -4,12 +4,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useJoinGroup } from "@/lib/hooks/use-groups";
 
 export default function JoinGroupScreen() {
@@ -44,8 +44,8 @@ export default function JoinGroupScreen() {
           Join Group
         </Text>
 
-        <TextInput
-          className="mb-6 rounded-lg border border-gray-300 px-4 py-3 text-center text-lg tracking-widest dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-6 text-center text-lg tracking-widest"
           placeholder="Enter invite code"
           value={inviteCode}
           onChangeText={setInviteCode}
@@ -53,15 +53,11 @@ export default function JoinGroupScreen() {
           autoCorrect={false}
         />
 
-        <Pressable
-          className="rounded-lg bg-blue-600 py-3 active:bg-blue-700"
+        <Button
+          title="Join Group"
           onPress={handleJoin}
-          disabled={joinGroup.isPending}
-        >
-          <Text className="text-center text-base font-semibold text-white">
-            {joinGroup.isPending ? "Joining..." : "Join Group"}
-          </Text>
-        </Pressable>
+          loading={joinGroup.isPending}
+        />
       </View>
     </KeyboardAvoidingView>
   );

@@ -4,13 +4,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
-  TextInput,
-  View,
 } from "react-native";
 
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useCreateGroup } from "@/lib/hooks/use-groups";
 
 export default function CreateGroupScreen() {
@@ -56,8 +55,8 @@ export default function CreateGroupScreen() {
         </Text>
 
         <Text className="mb-2 font-medium dark:text-gray-300">Group Name</Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="e.g. Morning Crew"
           value={name}
           onChangeText={setName}
@@ -66,8 +65,8 @@ export default function CreateGroupScreen() {
         <Text className="mb-2 font-medium dark:text-gray-300">
           Min Workouts Per Week
         </Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="3"
           value={minWorkoutsPerWeek}
           onChangeText={setMinWorkoutsPerWeek}
@@ -77,23 +76,19 @@ export default function CreateGroupScreen() {
         <Text className="mb-2 font-medium dark:text-gray-300">
           Min Minutes to Qualify
         </Text>
-        <TextInput
-          className="mb-6 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-6"
           placeholder="30"
           value={minMinutes}
           onChangeText={setMinMinutes}
           keyboardType="number-pad"
         />
 
-        <Pressable
-          className="rounded-lg bg-blue-600 py-3 active:bg-blue-700"
+        <Button
+          title="Create Group"
           onPress={handleCreate}
-          disabled={createGroup.isPending}
-        >
-          <Text className="text-center text-base font-semibold text-white">
-            {createGroup.isPending ? "Creating..." : "Create Group"}
-          </Text>
-        </Pressable>
+          loading={createGroup.isPending}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );

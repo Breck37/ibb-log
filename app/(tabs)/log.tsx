@@ -10,10 +10,11 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useMyGroups } from "@/lib/hooks/use-groups";
 import { useCreateWorkout } from "@/lib/hooks/use-workouts";
 import { pickImages } from "@/lib/services/image-upload";
@@ -145,8 +146,8 @@ export default function LogScreen() {
         <Text className="mb-2 font-medium dark:text-gray-300">
           Duration (minutes)
         </Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="45"
           value={duration}
           onChangeText={setDuration}
@@ -154,8 +155,8 @@ export default function LogScreen() {
         />
 
         <Text className="mb-2 font-medium dark:text-gray-300">Title</Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="e.g. Push day: bench, OHP, dips..."
           value={title}
           onChangeText={setTitle}
@@ -164,8 +165,8 @@ export default function LogScreen() {
         <Text className="mb-2 font-medium dark:text-gray-300">
           Description (optional)
         </Text>
-        <TextInput
-          className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
+        <Input
+          className="mb-4"
           placeholder="How did it go?"
           value={description}
           onChangeText={setDescription}
@@ -195,15 +196,11 @@ export default function LogScreen() {
           </Pressable>
         </View>
 
-        <Pressable
-          className="rounded-lg bg-blue-600 py-3 active:bg-blue-700"
+        <Button
+          title="Log Workout"
           onPress={handleSubmit}
-          disabled={createWorkout.isPending}
-        >
-          <Text className="text-center text-base font-semibold text-white">
-            {createWorkout.isPending ? "Logging..." : "Log Workout"}
-          </Text>
-        </Pressable>
+          loading={createWorkout.isPending}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
