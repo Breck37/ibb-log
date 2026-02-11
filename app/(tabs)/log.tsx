@@ -13,16 +13,17 @@ import {
   View,
 } from "react-native";
 
-import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { WorkoutCard } from "@/components/workoutCard";
 import { useMyGroups } from "@/lib/hooks/use-groups";
-import { useCreateWorkout } from "@/lib/hooks/use-workouts";
+import { useCreateWorkout, useMyWorkouts } from "@/lib/hooks/use-workouts";
 import { pickImages } from "@/lib/services/image-upload";
 
 export default function LogScreen() {
   const router = useRouter();
   const { data: groups } = useMyGroups();
   const createWorkout = useCreateWorkout();
+  const { data: recentWorkouts } = useMyWorkouts(5);
 
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const [duration, setDuration] = useState("");
@@ -39,7 +40,7 @@ export default function LogScreen() {
   const toggleGroup = (groupId: string) => {
     setSelectedGroupIds((prev) => {
       // Initialize from all groups if first interaction
-      const current = prev.length > 0 ? prev : groups?.map((g) => g.id) ?? [];
+      const current = prev.length > 0 ? prev : (groups?.map((g) => g.id) ?? []);
       return current.includes(groupId)
         ? current.filter((id) => id !== groupId)
         : [...current, groupId];
@@ -196,11 +197,22 @@ export default function LogScreen() {
           </Pressable>
         </View>
 
-        <Button
-          title="Log Workout"
-          onPress={handleSubmit}
-          loading={createWorkout.isPending}
-        />
+        <Pressable onPress={handleSubmit} disabled={createWorkout.isPending}>
+          <Text className="text-center text-base font-semibold text-white">
+            {createWorkout.isPending ? "Logging..." : "Log Workout"}
+          </Text>
+        </Pressable>
+
+        {recentWorkouts && recentWorkouts.length > 0 && (
+          <View className="mt-8">
+            <Text className="mb-3 text-sm font-semibold text-gray-500">
+              Recent Workouts
+            </Text>
+            {recentWorkouts.map((workout) => (
+              <WorkoutCard key={workout.id} workout={workout} />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
