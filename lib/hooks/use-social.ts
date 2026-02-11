@@ -2,23 +2,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabase";
 
-export function useReactions(workoutId: string) {
+export function useReactions(groupWorkoutId: string) {
   return useQuery({
-    queryKey: ["reactions", workoutId],
+    queryKey: ["reactions", groupWorkoutId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reactions")
         .select("*, profiles(username)")
-        .eq("workout_id", workoutId);
+        .eq("group_workout_id", groupWorkoutId);
 
       if (error) throw error;
       return data;
     },
-    enabled: !!workoutId,
+    enabled: !!groupWorkoutId,
   });
 }
 
-export function useToggleReaction(workoutId: string) {
+export function useToggleReaction(groupWorkoutId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -28,11 +28,10 @@ export function useToggleReaction(workoutId: string) {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Check if reaction exists
       const { data: existing } = await supabase
         .from("reactions")
         .select("id")
-        .eq("workout_id", workoutId)
+        .eq("group_workout_id", groupWorkoutId)
         .eq("user_id", user.id)
         .eq("emoji", emoji)
         .maybeSingle();
@@ -44,36 +43,40 @@ export function useToggleReaction(workoutId: string) {
           .eq("id", existing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("reactions")
-          .insert({ workout_id: workoutId, user_id: user.id, emoji });
+        const { error } = await supabase.from("reactions").insert({
+          group_workout_id: groupWorkoutId,
+          user_id: user.id,
+          emoji,
+        });
         if (error) throw error;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reactions", workoutId] });
+      queryClient.invalidateQueries({
+        queryKey: ["reactions", groupWorkoutId],
+      });
     },
   });
 }
 
-export function useComments(workoutId: string) {
+export function useComments(groupWorkoutId: string) {
   return useQuery({
-    queryKey: ["comments", workoutId],
+    queryKey: ["comments", groupWorkoutId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("comments")
         .select("*, profiles(username, display_name, avatar_url)")
-        .eq("workout_id", workoutId)
+        .eq("group_workout_id", groupWorkoutId)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
       return data;
     },
-    enabled: !!workoutId,
+    enabled: !!groupWorkoutId,
   });
 }
 
-export function useAddComment(workoutId: string) {
+export function useAddComment(groupWorkoutId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -92,7 +95,7 @@ export function useAddComment(workoutId: string) {
       const { data, error } = await supabase
         .from("comments")
         .insert({
-          workout_id: workoutId,
+          group_workout_id: groupWorkoutId,
           user_id: user.id,
           body,
           parent_id: parentId ?? null,
@@ -104,7 +107,9 @@ export function useAddComment(workoutId: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", workoutId] });
+      queryClient.invalidateQueries({
+        queryKey: ["comments", groupWorkoutId],
+      });
     },
   });
 }

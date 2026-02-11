@@ -8,7 +8,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "db:migrate": "npx supabase db push"
+    "db:migrate": "npx supabase db push",
+    "db:gen-types": "npx supabase gen types typescript --linked > lib/database.types.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

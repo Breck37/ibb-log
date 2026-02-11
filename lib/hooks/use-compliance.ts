@@ -18,8 +18,7 @@ export function useWeeklyCompliance(groupId: string, weekKey?: string) {
   return useQuery({
     queryKey: ["compliance", groupId, currentWeek],
     queryFn: async () => {
-      // Get group requirements + members
-      const [groupResult, membersResult, workoutsResult] = await Promise.all([
+      const [groupResult, membersResult, gwResult] = await Promise.all([
         supabase
           .from("groups")
           .select("min_workouts_per_week")
@@ -30,8 +29,8 @@ export function useWeeklyCompliance(groupId: string, weekKey?: string) {
           .select("user_id, profiles(username, display_name)")
           .eq("group_id", groupId),
         supabase
-          .from("workouts")
-          .select("user_id, is_qualified")
+          .from("group_workouts")
+          .select("workouts(user_id)")
           .eq("group_id", groupId)
           .eq("week_key", currentWeek)
           .eq("is_qualified", true),
@@ -39,14 +38,16 @@ export function useWeeklyCompliance(groupId: string, weekKey?: string) {
 
       if (groupResult.error) throw groupResult.error;
       if (membersResult.error) throw membersResult.error;
-      if (workoutsResult.error) throw workoutsResult.error;
+      if (gwResult.error) throw gwResult.error;
 
       const required = groupResult.data.min_workouts_per_week;
 
-      // Count qualified workouts per user
       const qualifiedCounts: Record<string, number> = {};
-      for (const w of workoutsResult.data) {
-        qualifiedCounts[w.user_id] = (qualifiedCounts[w.user_id] || 0) + 1;
+      for (const gw of gwResult.data) {
+        const userId = gw.workouts?.user_id;
+        if (userId) {
+          qualifiedCounts[userId] = (qualifiedCounts[userId] || 0) + 1;
+        }
       }
 
       const compliance: MemberCompliance[] = membersResult.data.map(
@@ -85,15 +86,13 @@ export function useLeaderboard(groupId: string, period: LeaderboardPeriod) {
     queryKey: ["leaderboard", groupId, period],
     queryFn: async () => {
       let query = supabase
-        .from("workouts")
-        .select("user_id, duration_minutes, is_qualified, week_key, created_at")
+        .from("group_workouts")
+        .select("is_qualified, week_key, created_at, workouts(user_id, duration_minutes)")
         .eq("group_id", groupId);
 
-      // Apply time filter
       const now = new Date();
       if (period === "weekly") {
-        const weekKey = getWeekKey(now);
-        query = query.eq("week_key", weekKey);
+        query = query.eq("week_key", getWeekKey(now));
       } else if (period === "monthly") {
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         query = query.gte("created_at", monthStart.toISOString());
@@ -102,10 +101,9 @@ export function useLeaderboard(groupId: string, period: LeaderboardPeriod) {
         query = query.gte("created_at", yearStart.toISOString());
       }
 
-      const { data: workouts, error: workoutsError } = await query;
-      if (workoutsError) throw workoutsError;
+      const { data: groupWorkouts, error: gwError } = await query;
+      if (gwError) throw gwError;
 
-      // Get member profiles
       const { data: members, error: membersError } = await supabase
         .from("group_members")
         .select("user_id, profiles(username, display_name)")
@@ -124,19 +122,22 @@ export function useLeaderboard(groupId: string, period: LeaderboardPeriod) {
         };
       }
 
-      // Aggregate stats per user
       const stats: Record<
         string,
         { qualified: number; totalMins: number; count: number }
       > = {};
 
-      for (const w of workouts) {
-        if (!stats[w.user_id]) {
-          stats[w.user_id] = { qualified: 0, totalMins: 0, count: 0 };
+      for (const gw of groupWorkouts) {
+        const userId = gw.workouts?.user_id;
+        const duration = gw.workouts?.duration_minutes ?? 0;
+        if (!userId) continue;
+
+        if (!stats[userId]) {
+          stats[userId] = { qualified: 0, totalMins: 0, count: 0 };
         }
-        stats[w.user_id].totalMins += w.duration_minutes;
-        stats[w.user_id].count += 1;
-        if (w.is_qualified) stats[w.user_id].qualified += 1;
+        stats[userId].totalMins += duration;
+        stats[userId].count += 1;
+        if (gw.is_qualified) stats[userId].qualified += 1;
       }
 
       const leaderboard: LeaderboardEntry[] = Object.entries(stats)

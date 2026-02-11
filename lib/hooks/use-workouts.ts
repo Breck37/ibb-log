@@ -7,10 +7,10 @@ import { uploadMultipleImages } from "@/lib/services/image-upload";
 import type { ImagePickerAsset } from "expo-image-picker";
 
 type WorkoutInput = {
-  groupId: string;
+  groupIds: string[];
   durationMinutes: number;
-  routine: string;
-  notes?: string;
+  title: string;
+  description?: string;
   images: ImagePickerAsset[];
 };
 
@@ -24,45 +24,57 @@ export function useCreateWorkout() {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Fetch group to check qualification
-      const { data: group, error: groupError } = await supabase
-        .from("groups")
-        .select("min_workout_minutes_to_qualify")
-        .eq("id", input.groupId)
-        .single();
-
-      if (groupError) throw groupError;
-
-      const isQualified =
-        input.durationMinutes >= group.min_workout_minutes_to_qualify;
-
       let imageUrls: string[] = [];
       if (input.images.length > 0) {
         imageUrls = await uploadMultipleImages(user.id, input.images);
       }
 
-      const { data, error } = await supabase
+      // Create the workout
+      const { data: workout, error: workoutError } = await supabase
         .from("workouts")
         .insert({
           user_id: user.id,
-          group_id: input.groupId,
+          title: input.title,
+          description: input.description || null,
           duration_minutes: input.durationMinutes,
-          routine: input.routine,
-          notes: input.notes || null,
           image_urls: imageUrls,
-          week_key: getWeekKey(),
-          is_qualified: isQualified,
         })
         .select()
         .single();
 
-      if (error) throw error;
-      return data;
+      if (workoutError) throw workoutError;
+
+      // Post to selected groups
+      if (input.groupIds.length > 0) {
+        // Fetch group configs for qualification check
+        const { data: groups, error: groupsError } = await supabase
+          .from("groups")
+          .select("id, min_workout_minutes_to_qualify")
+          .in("id", input.groupIds);
+
+        if (groupsError) throw groupsError;
+
+        const weekKey = getWeekKey();
+        const groupWorkoutRows = groups.map((group) => ({
+          workout_id: workout.id,
+          group_id: group.id,
+          week_key: weekKey,
+          is_qualified:
+            input.durationMinutes >= group.min_workout_minutes_to_qualify,
+        }));
+
+        const { error: gwError } = await supabase
+          .from("group_workouts")
+          .insert(groupWorkoutRows);
+
+        if (gwError) throw gwError;
+      }
+
+      return workout;
     },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["workouts", variables.groupId],
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workouts"] });
+      queryClient.invalidateQueries({ queryKey: ["group-workouts"] });
       queryClient.invalidateQueries({ queryKey: ["compliance"] });
     },
   });
@@ -70,11 +82,13 @@ export function useCreateWorkout() {
 
 export function useGroupWorkouts(groupId: string) {
   return useQuery({
-    queryKey: ["workouts", groupId],
+    queryKey: ["group-workouts", groupId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("workouts")
-        .select("*, profiles(username, display_name, avatar_url)")
+        .from("group_workouts")
+        .select(
+          "*, workouts(*, profiles(username, display_name, avatar_url))",
+        )
         .eq("group_id", groupId)
         .order("created_at", { ascending: false });
 
