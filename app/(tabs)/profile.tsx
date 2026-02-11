@@ -1,7 +1,7 @@
 import { Button, Input } from '@/components/ui/';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
+import { Camera, User } from 'phosphor-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -22,7 +22,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/auth-provider';
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -113,17 +113,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to sign out',
-      );
-    }
-  };
-
   const memberSince = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString('en-US', {
         month: 'long',
@@ -146,16 +135,16 @@ export default function ProfileScreen() {
                 style={{ width: 96, height: 96, borderRadius: 48 }}
               />
               <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-blue-600">
-                <FontAwesome name="camera" size={12} color="#fff" />
+                <Camera size={12} color="#fff" weight="fill" />
               </View>
             </View>
           ) : (
             <View>
               <View className="h-24 w-24 items-center justify-center rounded-full bg-blue-100">
-                <FontAwesome name="user" size={36} color="#3b82f6" />
+                <User size={36} color="#3b82f6" weight="fill" />
               </View>
               <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-blue-600">
-                <FontAwesome name="camera" size={12} color="#fff" />
+                <Camera size={12} color="#fff" weight="fill" />
               </View>
             </View>
           )}
@@ -265,13 +254,6 @@ export default function ProfileScreen() {
           ))}
         </View>
       )}
-
-      <Pressable
-        className="mb-6 rounded-lg border border-red-300 py-3 active:bg-red-50"
-        onPress={handleSignOut}
-      >
-        <Text className="text-center font-medium text-red-600">Sign Out</Text>
-      </Pressable>
 
       {workouts && workouts.length > 0 && (
         <Text className="mb-2 text-sm font-semibold text-gray-500">
