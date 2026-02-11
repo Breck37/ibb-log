@@ -1,14 +1,14 @@
-import * as ImageManipulator from "expo-image-manipulator";
-import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from '@/lib/supabase';
 
 const MAX_WIDTH = 1080;
 const JPEG_QUALITY = 0.7;
 
 export async function pickImages(): Promise<ImagePicker.ImagePickerAsset[]> {
   const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
+    mediaTypes: ['images'],
     allowsMultipleSelection: true,
     quality: 1,
   });
@@ -39,9 +39,9 @@ export async function uploadWorkoutImage(
   const arrayBuffer = await new Response(blob).arrayBuffer();
 
   const { error } = await supabase.storage
-    .from("workout-images")
+    .from('workout-images')
     .upload(fileName, arrayBuffer, {
-      contentType: "image/jpeg",
+      contentType: 'image/jpeg',
       upsert: false,
     });
 
@@ -49,7 +49,7 @@ export async function uploadWorkoutImage(
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from("workout-images").getPublicUrl(fileName);
+  } = supabase.storage.from('workout-images').getPublicUrl(fileName);
 
   return publicUrl;
 }
@@ -66,7 +66,7 @@ export async function uploadMultipleImages(
 
 export async function pickSingleImage(): Promise<ImagePicker.ImagePickerAsset | null> {
   const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
+    mediaTypes: ['images'],
     allowsMultipleSelection: false,
     quality: 1,
   });
@@ -88,9 +88,9 @@ export async function uploadAvatar(
   const arrayBuffer = await new Response(blob).arrayBuffer();
 
   const { error } = await supabase.storage
-    .from("avatars")
+    .from('avatars')
     .upload(fileName, arrayBuffer, {
-      contentType: "image/jpeg",
+      contentType: 'image/jpeg',
       upsert: true,
     });
 
@@ -98,7 +98,7 @@ export async function uploadAvatar(
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from("avatars").getPublicUrl(fileName);
+  } = supabase.storage.from('avatars').getPublicUrl(fileName);
 
   return publicUrl;
 }

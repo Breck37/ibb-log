@@ -1,7 +1,7 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Image, ScrollView, Text, View } from "react-native";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Image, ScrollView, Text, View } from 'react-native';
 
-import type { FeedWorkout } from "@/lib/hooks/use-workouts";
+import type { FeedWorkout } from '@/lib/hooks/use-workouts';
 
 type WorkoutCardProps = {
   workout: FeedWorkout;
@@ -9,7 +9,7 @@ type WorkoutCardProps = {
 
 export function WorkoutCard({ workout }: WorkoutCardProps) {
   const displayName =
-    workout.profiles?.display_name ?? workout.profiles?.username ?? "You";
+    workout.profiles?.display_name ?? workout.profiles?.username ?? 'You';
   const timeAgo = getTimeAgo(workout.created_at);
 
   return (
@@ -74,7 +74,7 @@ function getTimeAgo(dateString: string): string {
   const diffMs = now - then;
   const diffMins = Math.floor(diffMs / 60000);
 
-  if (diffMins < 1) return "just now";
+  if (diffMins < 1) return 'just now';
   if (diffMins < 60) return `${diffMins}m ago`;
 
   const diffHours = Math.floor(diffMins / 60);

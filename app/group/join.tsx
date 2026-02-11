@@ -1,25 +1,25 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useJoinGroup } from "@/lib/hooks/use-groups";
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { useJoinGroup } from '@/lib/hooks/use-groups';
 
 export default function JoinGroupScreen() {
   const router = useRouter();
   const joinGroup = useJoinGroup();
-  const [inviteCode, setInviteCode] = useState("");
+  const [inviteCode, setInviteCode] = useState('');
 
   const handleJoin = async () => {
     if (!inviteCode.trim()) {
-      Alert.alert("Error", "Please enter an invite code");
+      Alert.alert('Error', 'Please enter an invite code');
       return;
     }
 
@@ -28,15 +28,15 @@ export default function JoinGroupScreen() {
       router.replace(`/group/${group.id}`);
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to join group",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to join group',
       );
     }
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <View className="flex-1 justify-center px-8">

@@ -1,10 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { supabase } from "@/lib/supabase";
-import { getWeekKey } from "@/lib/week-key";
-import { uploadMultipleImages } from "@/lib/services/image-upload";
+import { supabase } from '@/lib/supabase';
+import { getWeekKey } from '@/lib/week-key';
+import { uploadMultipleImages } from '@/lib/services/image-upload';
 
-import type { ImagePickerAsset } from "expo-image-picker";
+import type { ImagePickerAsset } from 'expo-image-picker';
 
 type WorkoutInput = {
   groupIds: string[];
@@ -22,7 +22,7 @@ export function useCreateWorkout() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error('Not authenticated');
 
       let imageUrls: string[] = [];
       if (input.images.length > 0) {
@@ -31,7 +31,7 @@ export function useCreateWorkout() {
 
       // Create the workout
       const { data: workout, error: workoutError } = await supabase
-        .from("workouts")
+        .from('workouts')
         .insert({
           user_id: user.id,
           title: input.title,
@@ -48,9 +48,9 @@ export function useCreateWorkout() {
       if (input.groupIds.length > 0) {
         // Fetch group configs for qualification check
         const { data: groups, error: groupsError } = await supabase
-          .from("groups")
-          .select("id, min_workout_minutes_to_qualify")
-          .in("id", input.groupIds);
+          .from('groups')
+          .select('id, min_workout_minutes_to_qualify')
+          .in('id', input.groupIds);
 
         if (groupsError) throw groupsError;
 
@@ -64,7 +64,7 @@ export function useCreateWorkout() {
         }));
 
         const { error: gwError } = await supabase
-          .from("group_workouts")
+          .from('group_workouts')
           .insert(groupWorkoutRows);
 
         if (gwError) throw gwError;
@@ -73,24 +73,22 @@ export function useCreateWorkout() {
       return workout;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workouts"] });
-      queryClient.invalidateQueries({ queryKey: ["group-workouts"] });
-      queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['compliance'] });
     },
   });
 }
 
 export function useGroupWorkouts(groupId: string) {
   return useQuery({
-    queryKey: ["group-workouts", groupId],
+    queryKey: ['group-workouts', groupId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("group_workouts")
-        .select(
-          "*, workouts(*, profiles(username, display_name, avatar_url))",
-        )
-        .eq("group_id", groupId)
-        .order("created_at", { ascending: false });
+        .from('group_workouts')
+        .select('*, workouts(*, profiles(username, display_name, avatar_url))')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data;
@@ -117,14 +115,14 @@ export type FeedWorkout = {
 
 export function useFeedWorkouts() {
   return useQuery({
-    queryKey: ["workouts", "feed"],
+    queryKey: ['workouts', 'feed'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("group_workouts")
+        .from('group_workouts')
         .select(
-          "is_qualified, groups(name), workouts(*, profiles(username, display_name, avatar_url))",
+          'is_qualified, groups(name), workouts(*, profiles(username, display_name, avatar_url))',
         )
-        .order("created_at", { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -136,7 +134,7 @@ export function useFeedWorkouts() {
         image_urls: row.workouts!.image_urls ?? [],
         created_at: row.workouts!.created_at,
         is_qualified: row.is_qualified,
-        groupName: row.groups?.name ?? "",
+        groupName: row.groups?.name ?? '',
         profiles: row.workouts!.profiles,
       })) satisfies FeedWorkout[];
     },
@@ -145,18 +143,18 @@ export function useFeedWorkouts() {
 
 export function useMyWorkouts(limit?: number) {
   return useQuery({
-    queryKey: ["workouts", "mine", limit],
+    queryKey: ['workouts', 'mine', limit],
     queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error('Not authenticated');
 
       let query = supabase
-        .from("workouts")
-        .select("*, group_workouts(is_qualified, groups(name))")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .from('workouts')
+        .select('*, group_workouts(is_qualified, groups(name))')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       if (limit) {
         query = query.limit(limit);
@@ -175,7 +173,7 @@ export function useMyWorkouts(limit?: number) {
           image_urls: row.image_urls ?? [],
           created_at: row.created_at,
           is_qualified: firstGw?.is_qualified ?? false,
-          groupName: firstGw?.groups?.name ?? "",
+          groupName: firstGw?.groups?.name ?? '',
           profiles: null,
         } satisfies FeedWorkout;
       });

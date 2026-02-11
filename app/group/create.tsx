@@ -1,27 +1,27 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
-} from "react-native";
+} from 'react-native';
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useCreateGroup } from "@/lib/hooks/use-groups";
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { useCreateGroup } from '@/lib/hooks/use-groups';
 
 export default function CreateGroupScreen() {
   const router = useRouter();
   const createGroup = useCreateGroup();
-  const [name, setName] = useState("");
-  const [minWorkoutsPerWeek, setMinWorkoutsPerWeek] = useState("3");
-  const [minMinutes, setMinMinutes] = useState("30");
+  const [name, setName] = useState('');
+  const [minWorkoutsPerWeek, setMinWorkoutsPerWeek] = useState('3');
+  const [minMinutes, setMinMinutes] = useState('30');
 
   const handleCreate = async () => {
     if (!name.trim()) {
-      Alert.alert("Error", "Please enter a group name");
+      Alert.alert('Error', 'Please enter a group name');
       return;
     }
 
@@ -34,15 +34,15 @@ export default function CreateGroupScreen() {
       router.replace(`/group/${group.id}`);
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to create group",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to create group',
       );
     }
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <ScrollView

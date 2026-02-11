@@ -1,27 +1,27 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useQuery } from "@tanstack/react-query";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useQuery } from '@tanstack/react-query';
+import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import {
   ActivityIndicator,
   Pressable,
   ScrollView,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { supabase } from "@/lib/supabase";
-import { useGroupMembers } from "@/lib/hooks/use-groups";
+import { supabase } from '@/lib/supabase';
+import { useGroupMembers } from '@/lib/hooks/use-groups';
 
 export default function GroupDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data: group, isLoading } = useQuery({
-    queryKey: ["group", id],
+    queryKey: ['group', id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("groups")
-        .select("*")
-        .eq("id", id)
+        .from('groups')
+        .select('*')
+        .eq('id', id)
         .single();
       if (error) throw error;
       return data;
@@ -70,7 +70,7 @@ export default function GroupDetailScreen() {
             Invite code: {group.invite_code}
           </Text>
           <Text className="mt-1 text-sm text-gray-500">
-            {group.min_workouts_per_week} workouts/week &middot;{" "}
+            {group.min_workouts_per_week} workouts/week &middot;{' '}
             {group.min_workout_minutes_to_qualify}min minimum
           </Text>
         </View>

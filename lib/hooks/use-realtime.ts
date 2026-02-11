@@ -1,7 +1,7 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from '@/lib/supabase';
 
 /**
  * Subscribes to Supabase realtime changes for a group's workouts
@@ -16,23 +16,23 @@ export function useRealtimeFeed(groupId: string | null) {
     const channel = supabase
       .channel(`feed:${groupId}`)
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "workouts",
+          event: '*',
+          schema: 'public',
+          table: 'workouts',
           filter: `group_id=eq.${groupId}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["workouts", groupId] });
+          queryClient.invalidateQueries({ queryKey: ['workouts', groupId] });
         },
       )
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "reactions",
+          event: '*',
+          schema: 'public',
+          table: 'reactions',
         },
         (payload) => {
           const workoutId =
@@ -40,17 +40,17 @@ export function useRealtimeFeed(groupId: string | null) {
             (payload.old as Record<string, unknown>)?.workout_id;
           if (workoutId) {
             queryClient.invalidateQueries({
-              queryKey: ["reactions", workoutId],
+              queryKey: ['reactions', workoutId],
             });
           }
         },
       )
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "comments",
+          event: '*',
+          schema: 'public',
+          table: 'comments',
         },
         (payload) => {
           const workoutId =
@@ -58,7 +58,7 @@ export function useRealtimeFeed(groupId: string | null) {
             (payload.old as Record<string, unknown>)?.workout_id;
           if (workoutId) {
             queryClient.invalidateQueries({
-              queryKey: ["comments", workoutId],
+              queryKey: ['comments', workoutId],
             });
           }
         },

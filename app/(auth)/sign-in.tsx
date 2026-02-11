@@ -1,5 +1,5 @@
-import { Link } from "expo-router";
-import { useState } from "react";
+import { Link } from 'expo-router';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -7,21 +7,21 @@ import {
   Pressable,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useAuth } from "@/providers/auth-provider";
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function SignInScreen() {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -30,8 +30,8 @@ export default function SignInScreen() {
       await signIn(email, password);
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to sign in",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to sign in',
       );
     } finally {
       setLoading(false);
@@ -40,7 +40,7 @@ export default function SignInScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <View className="flex-1 justify-center px-8">

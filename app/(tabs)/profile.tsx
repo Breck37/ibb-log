@@ -1,8 +1,8 @@
-import { Button, Input } from "@/components/ui/";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "expo-router";
-import { useState } from "react";
+import { Button, Input } from '@/components/ui/';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -11,34 +11,34 @@ import {
   Pressable,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { WorkoutCard } from "@/components/workoutCard";
-import { useMyGroups } from "@/lib/hooks/use-groups";
-import { useUserStats } from "@/lib/hooks/use-stats";
-import { useMyWorkouts } from "@/lib/hooks/use-workouts";
-import { pickSingleImage, uploadAvatar } from "@/lib/services/image-upload";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/providers/auth-provider";
+import { WorkoutCard } from '@/components/workoutCard';
+import { useMyGroups } from '@/lib/hooks/use-groups';
+import { useUserStats } from '@/lib/hooks/use-stats';
+import { useMyWorkouts } from '@/lib/hooks/use-workouts';
+import { pickSingleImage, uploadAvatar } from '@/lib/services/image-upload';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [displayName, setDisplayName] = useState("");
-  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user) return null;
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
         .single();
       if (error) throw error;
       return data;
@@ -51,8 +51,8 @@ export default function ProfileScreen() {
   const { data: stats } = useUserStats();
 
   const handleStartEditing = () => {
-    setDisplayName(profile?.display_name ?? "");
-    setUsername(profile?.username ?? "");
+    setDisplayName(profile?.display_name ?? '');
+    setUsername(profile?.username ?? '');
     setIsEditing(true);
   };
 
@@ -68,18 +68,18 @@ export default function ProfileScreen() {
       }
 
       const { error } = await supabase
-        .from("profiles")
+        .from('profiles')
         .update(updates)
-        .eq("id", user.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
       setIsEditing(false);
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to save profile",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to save profile',
       );
     } finally {
       setIsSaving(false);
@@ -96,17 +96,17 @@ export default function ProfileScreen() {
       const publicUrl = await uploadAvatar(user.id, asset.uri);
 
       const { error } = await supabase
-        .from("profiles")
+        .from('profiles')
         .update({ avatar_url: publicUrl })
-        .eq("id", user.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to upload avatar",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to upload avatar',
       );
     } finally {
       setIsUploadingAvatar(false);
@@ -118,16 +118,16 @@ export default function ProfileScreen() {
       await signOut();
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to sign out",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to sign out',
       );
     }
   };
 
   const memberSince = profile?.created_at
-    ? new Date(profile.created_at).toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
+    ? new Date(profile.created_at).toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric',
       })
     : null;
 
@@ -206,10 +206,10 @@ export default function ProfileScreen() {
         ) : (
           <>
             <Text className="text-xl font-bold dark:text-white">
-              {profile?.display_name ?? profile?.username ?? "Loading..."}
+              {profile?.display_name ?? profile?.username ?? 'Loading...'}
             </Text>
             <Text className="text-sm text-gray-500">
-              @{profile?.username ?? "..."}
+              @{profile?.username ?? '...'}
             </Text>
             <Text className="mt-1 text-xs text-gray-400">{user?.email}</Text>
             {memberSince && (

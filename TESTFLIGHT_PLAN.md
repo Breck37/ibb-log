@@ -95,11 +95,13 @@ Update `eas.json` to add a TestFlight-specific build profile:
 Push notifications are a core feature. Set this up before the first TestFlight build so the entitlements are correct from the start.
 
 1. Install `expo-notifications`:
+
    ```bash
    pnpm add expo-notifications expo-device expo-constants
    ```
 
 2. Add the plugin to `app.json`:
+
    ```json
    {
      "expo": {
@@ -129,6 +131,7 @@ Push notifications are a core feature. Set this up before the first TestFlight b
 ## Step 5: Environment Variables & Secrets
 
 1. Set Supabase environment variables for EAS builds:
+
    ```bash
    eas secret:create --name EXPO_PUBLIC_SUPABASE_URL --value "<your-supabase-url>" --scope project
    eas secret:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<your-anon-key>" --scope project

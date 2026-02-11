@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from "@/lib/supabase";
-import { getWeekKey } from "@/lib/week-key";
+import { supabase } from '@/lib/supabase';
+import { getWeekKey } from '@/lib/week-key';
 
 export type MemberCompliance = {
   userId: string;
@@ -16,24 +16,24 @@ export function useWeeklyCompliance(groupId: string, weekKey?: string) {
   const currentWeek = weekKey ?? getWeekKey();
 
   return useQuery({
-    queryKey: ["compliance", groupId, currentWeek],
+    queryKey: ['compliance', groupId, currentWeek],
     queryFn: async () => {
       const [groupResult, membersResult, gwResult] = await Promise.all([
         supabase
-          .from("groups")
-          .select("min_workouts_per_week")
-          .eq("id", groupId)
+          .from('groups')
+          .select('min_workouts_per_week')
+          .eq('id', groupId)
           .single(),
         supabase
-          .from("group_members")
-          .select("user_id, profiles(username, display_name)")
-          .eq("group_id", groupId),
+          .from('group_members')
+          .select('user_id, profiles(username, display_name)')
+          .eq('group_id', groupId),
         supabase
-          .from("group_workouts")
-          .select("workouts(user_id)")
-          .eq("group_id", groupId)
-          .eq("week_key", currentWeek)
-          .eq("is_qualified", true),
+          .from('group_workouts')
+          .select('workouts(user_id)')
+          .eq('group_id', groupId)
+          .eq('week_key', currentWeek)
+          .eq('is_qualified', true),
       ]);
 
       if (groupResult.error) throw groupResult.error;
@@ -55,7 +55,7 @@ export function useWeeklyCompliance(groupId: string, weekKey?: string) {
           const qualifiedCount = qualifiedCounts[member.user_id] || 0;
           return {
             userId: member.user_id,
-            username: member.profiles?.username ?? "Unknown",
+            username: member.profiles?.username ?? 'Unknown',
             displayName: member.profiles?.display_name ?? null,
             qualifiedCount,
             required,
@@ -79,35 +79,37 @@ export type LeaderboardEntry = {
   avgMinutes: number;
 };
 
-type LeaderboardPeriod = "weekly" | "monthly" | "yearly" | "all-time";
+type LeaderboardPeriod = 'weekly' | 'monthly' | 'yearly' | 'all-time';
 
 export function useLeaderboard(groupId: string, period: LeaderboardPeriod) {
   return useQuery({
-    queryKey: ["leaderboard", groupId, period],
+    queryKey: ['leaderboard', groupId, period],
     queryFn: async () => {
       let query = supabase
-        .from("group_workouts")
-        .select("is_qualified, week_key, created_at, workouts(user_id, duration_minutes)")
-        .eq("group_id", groupId);
+        .from('group_workouts')
+        .select(
+          'is_qualified, week_key, created_at, workouts(user_id, duration_minutes)',
+        )
+        .eq('group_id', groupId);
 
       const now = new Date();
-      if (period === "weekly") {
-        query = query.eq("week_key", getWeekKey(now));
-      } else if (period === "monthly") {
+      if (period === 'weekly') {
+        query = query.eq('week_key', getWeekKey(now));
+      } else if (period === 'monthly') {
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        query = query.gte("created_at", monthStart.toISOString());
-      } else if (period === "yearly") {
+        query = query.gte('created_at', monthStart.toISOString());
+      } else if (period === 'yearly') {
         const yearStart = new Date(now.getFullYear(), 0, 1);
-        query = query.gte("created_at", yearStart.toISOString());
+        query = query.gte('created_at', yearStart.toISOString());
       }
 
       const { data: groupWorkouts, error: gwError } = await query;
       if (gwError) throw gwError;
 
       const { data: members, error: membersError } = await supabase
-        .from("group_members")
-        .select("user_id, profiles(username, display_name)")
-        .eq("group_id", groupId);
+        .from('group_members')
+        .select('user_id, profiles(username, display_name)')
+        .eq('group_id', groupId);
 
       if (membersError) throw membersError;
 
@@ -117,7 +119,7 @@ export function useLeaderboard(groupId: string, period: LeaderboardPeriod) {
       > = {};
       for (const m of members) {
         profileMap[m.user_id] = {
-          username: m.profiles?.username ?? "Unknown",
+          username: m.profiles?.username ?? 'Unknown',
           displayName: m.profiles?.display_name ?? null,
         };
       }
@@ -143,7 +145,7 @@ export function useLeaderboard(groupId: string, period: LeaderboardPeriod) {
       const leaderboard: LeaderboardEntry[] = Object.entries(stats)
         .map(([userId, s]) => ({
           userId,
-          username: profileMap[userId]?.username ?? "Unknown",
+          username: profileMap[userId]?.username ?? 'Unknown',
           displayName: profileMap[userId]?.displayName ?? null,
           totalQualifiedWorkouts: s.qualified,
           totalMinutes: s.totalMins,

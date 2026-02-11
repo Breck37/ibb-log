@@ -1,5 +1,5 @@
-import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { Link, useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -7,36 +7,36 @@ import {
   Pressable,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useAuth } from "@/providers/auth-provider";
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (!email || !password || !username) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
     try {
       await signUp(email, password, username);
-      Alert.alert("Success", "Check your email for a confirmation link!", [
-        { text: "OK", onPress: () => router.replace("/(auth)/sign-in") },
+      Alert.alert('Success', 'Check your email for a confirmation link!', [
+        { text: 'OK', onPress: () => router.replace('/(auth)/sign-in') },
       ]);
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to sign up",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to sign up',
       );
     } finally {
       setLoading(false);
@@ -45,7 +45,7 @@ export default function SignUpScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <View className="flex-1 justify-center px-8">

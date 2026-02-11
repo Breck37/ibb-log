@@ -1,14 +1,14 @@
-import type { Session, User } from "@supabase/supabase-js";
-import { useRouter, useSegments } from "expo-router";
+import type { Session, User } from '@supabase/supabase-js';
+import { useRouter, useSegments } from 'expo-router';
 import {
   createContext,
   useContext,
   useEffect,
   useState,
   type PropsWithChildren,
-} from "react";
+} from 'react';
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from '@/lib/supabase';
 
 type AuthContextType = {
   session: Session | null;
@@ -39,12 +39,12 @@ function useProtectedRoute(user: User | null, isLoading: boolean) {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "(auth)";
+    const inAuthGroup = segments[0] === '(auth)';
 
     if (!user && !inAuthGroup) {
-      router.replace("/(auth)/sign-in");
+      router.replace('/(auth)/sign-in');
     } else if (user && inAuthGroup) {
-      router.replace("/(tabs)");
+      router.replace('/(tabs)');
     }
   }, [user, segments, isLoading]);
 }

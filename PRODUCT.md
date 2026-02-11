@@ -136,19 +136,19 @@ A group workout accountability app where users track workouts, post to groups, a
 
 ### Tables
 
-| Table | Purpose |
-|---|---|
-| `profiles` | Extends auth.users — username, display_name, avatar_url, bio |
-| `groups` | Name, description, subtitle, avatar, visibility, invite_code, workout config |
-| `group_members` | Junction: user ↔ group with role (admin/member) |
-| `group_invites` | Invitations with token, email, role, status, expiry |
-| `workouts` | User-owned workout: title, description, duration, images |
-| `group_workouts` | Junction: workout posted to a group, with week_key and qualification status |
-| `reactions` | Emoji reactions on group_workouts (per-group) |
-| `comments` | Threaded comments on group_workouts (per-group) |
-| `group_messages` | Group chat messages |
-| `achievements` | User milestone records (workout count thresholds reached) |
-| `weekly_reports` | Per-group weekly summaries: member qualification status, workout counts |
+| Table            | Purpose                                                                      |
+| ---------------- | ---------------------------------------------------------------------------- |
+| `profiles`       | Extends auth.users — username, display_name, avatar_url, bio                 |
+| `groups`         | Name, description, subtitle, avatar, visibility, invite_code, workout config |
+| `group_members`  | Junction: user ↔ group with role (admin/member)                              |
+| `group_invites`  | Invitations with token, email, role, status, expiry                          |
+| `workouts`       | User-owned workout: title, description, duration, images                     |
+| `group_workouts` | Junction: workout posted to a group, with week_key and qualification status  |
+| `reactions`      | Emoji reactions on group_workouts (per-group)                                |
+| `comments`       | Threaded comments on group_workouts (per-group)                              |
+| `group_messages` | Group chat messages                                                          |
+| `achievements`   | User milestone records (workout count thresholds reached)                    |
+| `weekly_reports` | Per-group weekly summaries: member qualification status, workout counts      |
 
 ## Deployment & Release
 

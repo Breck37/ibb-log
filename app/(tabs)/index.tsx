@@ -1,9 +1,9 @@
-import { Link } from "expo-router";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { Link } from 'expo-router';
+import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 
-import { Button } from "@/components/ui/Button";
-import { WorkoutCard } from "@/components/workoutCard";
-import { useFeedWorkouts } from "@/lib/hooks/use-workouts";
+import { Button } from '@/components/ui/Button';
+import { WorkoutCard } from '@/components/workoutCard';
+import { useFeedWorkouts } from '@/lib/hooks/use-workouts';
 
 export default function FeedScreen() {
   const { data: workouts, isLoading, error } = useFeedWorkouts();
