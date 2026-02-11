@@ -23,27 +23,29 @@ import {
 const REACTION_EMOJIS = ["💪", "🔥", "👏", "🎯", "⭐"];
 
 export default function WorkoutDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: groupWorkoutId } = useLocalSearchParams<{ id: string }>();
   const [commentText, setCommentText] = useState("");
 
-  const { data: workout, isLoading } = useQuery({
-    queryKey: ["workout", id],
+  const { data: groupWorkout, isLoading } = useQuery({
+    queryKey: ["group-workout", groupWorkoutId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("workouts")
-        .select("*, profiles(username, display_name, avatar_url)")
-        .eq("id", id)
+        .from("group_workouts")
+        .select(
+          "*, workouts(*, profiles(username, display_name, avatar_url)), groups(name)",
+        )
+        .eq("id", groupWorkoutId)
         .single();
       if (error) throw error;
       return data;
     },
-    enabled: !!id,
+    enabled: !!groupWorkoutId,
   });
 
-  const { data: reactions } = useReactions(id);
-  const toggleReaction = useToggleReaction(id);
-  const { data: comments } = useComments(id);
-  const addComment = useAddComment(id);
+  const { data: reactions } = useReactions(groupWorkoutId);
+  const toggleReaction = useToggleReaction(groupWorkoutId);
+  const { data: comments } = useComments(groupWorkoutId);
+  const addComment = useAddComment(groupWorkoutId);
 
   const handleComment = async () => {
     if (!commentText.trim()) return;
@@ -59,7 +61,9 @@ export default function WorkoutDetailScreen() {
     );
   }
 
-  if (!workout) {
+  const workout = groupWorkout?.workouts;
+
+  if (!groupWorkout || !workout) {
     return (
       <View className="flex-1 items-center justify-center">
         <Text className="text-gray-500">Workout not found</Text>
@@ -67,7 +71,6 @@ export default function WorkoutDetailScreen() {
     );
   }
 
-  // Group reactions by emoji
   const reactionGroups = (reactions ?? []).reduce(
     (acc, r) => {
       acc[r.emoji] = (acc[r.emoji] || 0) + 1;
@@ -88,7 +91,7 @@ export default function WorkoutDetailScreen() {
             <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <FontAwesome name="user" size={20} color="#3b82f6" />
             </View>
-            <View>
+            <View className="flex-1">
               <Text className="text-lg font-semibold dark:text-white">
                 {displayName}
               </Text>
@@ -96,13 +99,20 @@ export default function WorkoutDetailScreen() {
                 {new Date(workout.created_at).toLocaleString()}
               </Text>
             </View>
+            {groupWorkout.groups?.name && (
+              <View className="rounded-full bg-gray-100 px-2 py-1 dark:bg-gray-700">
+                <Text className="text-xs text-gray-600 dark:text-gray-300">
+                  {groupWorkout.groups.name}
+                </Text>
+              </View>
+            )}
           </View>
 
           <View className="mb-2 flex-row items-center gap-2">
             <Text className="text-2xl font-bold dark:text-white">
               {workout.duration_minutes} min
             </Text>
-            {workout.is_qualified && (
+            {groupWorkout.is_qualified && (
               <View className="rounded-full bg-green-100 px-2 py-1">
                 <Text className="text-xs font-medium text-green-700">
                   Qualified
@@ -112,11 +122,11 @@ export default function WorkoutDetailScreen() {
           </View>
 
           <Text className="mb-1 text-base font-medium dark:text-white">
-            {workout.routine}
+            {workout.title}
           </Text>
-          {workout.notes && (
+          {workout.description && (
             <Text className="text-gray-600 dark:text-gray-400">
-              {workout.notes}
+              {workout.description}
             </Text>
           )}
 

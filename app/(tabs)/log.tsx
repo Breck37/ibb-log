@@ -23,11 +23,27 @@ export default function LogScreen() {
   const { data: groups } = useMyGroups();
   const createWorkout = useCreateWorkout();
 
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const [duration, setDuration] = useState("");
-  const [routine, setRoutine] = useState("");
-  const [notes, setNotes] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [images, setImages] = useState<ImagePickerAsset[]>([]);
+
+  // Auto-select all groups when they load and none are selected yet
+  const effectiveGroupIds =
+    selectedGroupIds.length > 0
+      ? selectedGroupIds
+      : (groups?.map((g) => g.id) ?? []);
+
+  const toggleGroup = (groupId: string) => {
+    setSelectedGroupIds((prev) => {
+      // Initialize from all groups if first interaction
+      const current = prev.length > 0 ? prev : groups?.map((g) => g.id) ?? [];
+      return current.includes(groupId)
+        ? current.filter((id) => id !== groupId)
+        : [...current, groupId];
+    });
+  };
 
   const handlePickImages = async () => {
     const assets = await pickImages();
@@ -41,33 +57,34 @@ export default function LogScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!selectedGroupId) {
-      Alert.alert("Error", "Please select a group");
-      return;
-    }
     if (!duration || parseInt(duration, 10) <= 0) {
       Alert.alert("Error", "Please enter a valid duration");
       return;
     }
-    if (!routine.trim()) {
-      Alert.alert("Error", "Please describe your routine");
+    if (!title.trim()) {
+      Alert.alert("Error", "Please enter a title");
+      return;
+    }
+    if (images.length === 0) {
+      Alert.alert("Error", "Please add at least one photo");
       return;
     }
 
     try {
       await createWorkout.mutateAsync({
-        groupId: selectedGroupId,
+        groupIds: effectiveGroupIds,
         durationMinutes: parseInt(duration, 10),
-        routine: routine.trim(),
-        notes: notes.trim() || undefined,
+        title: title.trim(),
+        description: description.trim() || undefined,
         images,
       });
 
       Alert.alert("Success", "Workout logged!");
       setDuration("");
-      setRoutine("");
-      setNotes("");
+      setTitle("");
+      setDescription("");
       setImages([]);
+      setSelectedGroupIds([]);
       router.navigate("/(tabs)");
     } catch (error) {
       Alert.alert(
@@ -76,6 +93,8 @@ export default function LogScreen() {
       );
     }
   };
+
+  const showGroupSelector = groups && groups.length > 1;
 
   return (
     <KeyboardAvoidingView
@@ -87,35 +106,41 @@ export default function LogScreen() {
         contentContainerClassName="p-4 pb-10"
         keyboardShouldPersistTaps="handled"
       >
-        <Text className="mb-2 font-medium dark:text-gray-300">Group</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="mb-4"
-          contentContainerClassName="gap-2"
-        >
-          {groups?.map((group) => (
-            <Pressable
-              key={group.id}
-              className={`rounded-full px-4 py-2 ${
-                selectedGroupId === group.id
-                  ? "bg-blue-600"
-                  : "bg-gray-200 dark:bg-gray-700"
-              }`}
-              onPress={() => setSelectedGroupId(group.id)}
+        {showGroupSelector && (
+          <>
+            <Text className="mb-2 font-medium dark:text-gray-300">
+              Post to Groups
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="mb-4"
+              contentContainerClassName="gap-2"
             >
-              <Text
-                className={`text-sm font-medium ${
-                  selectedGroupId === group.id
-                    ? "text-white"
-                    : "dark:text-white"
-                }`}
-              >
-                {group.name}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+              {groups.map((group) => (
+                <Pressable
+                  key={group.id}
+                  className={`rounded-full px-4 py-2 ${
+                    effectiveGroupIds.includes(group.id)
+                      ? "bg-blue-600"
+                      : "bg-gray-200 dark:bg-gray-700"
+                  }`}
+                  onPress={() => toggleGroup(group.id)}
+                >
+                  <Text
+                    className={`text-sm font-medium ${
+                      effectiveGroupIds.includes(group.id)
+                        ? "text-white"
+                        : "dark:text-white"
+                    }`}
+                  >
+                    {group.name}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </>
+        )}
 
         <Text className="mb-2 font-medium dark:text-gray-300">
           Duration (minutes)
@@ -128,27 +153,24 @@ export default function LogScreen() {
           keyboardType="number-pad"
         />
 
-        <Text className="mb-2 font-medium dark:text-gray-300">Routine</Text>
+        <Text className="mb-2 font-medium dark:text-gray-300">Title</Text>
         <TextInput
           className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
           placeholder="e.g. Push day: bench, OHP, dips..."
-          value={routine}
-          onChangeText={setRoutine}
-          multiline
-          numberOfLines={3}
-          textAlignVertical="top"
+          value={title}
+          onChangeText={setTitle}
         />
 
         <Text className="mb-2 font-medium dark:text-gray-300">
-          Notes (optional)
+          Description (optional)
         </Text>
         <TextInput
           className="mb-4 rounded-lg border border-gray-300 px-4 py-3 text-base dark:border-gray-600 dark:text-white"
           placeholder="How did it go?"
-          value={notes}
-          onChangeText={setNotes}
+          value={description}
+          onChangeText={setDescription}
           multiline
-          numberOfLines={2}
+          numberOfLines={3}
           textAlignVertical="top"
         />
 
