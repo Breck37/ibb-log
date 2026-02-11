@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -16,6 +17,13 @@ import {
 } from "@/lib/hooks/use-compliance";
 
 const PERIODS = ["weekly", "monthly", "yearly", "all-time"] as const;
+
+const PERIOD_LABELS: Record<(typeof PERIODS)[number], string> = {
+  weekly: "Week",
+  monthly: "Month",
+  yearly: "Year",
+  "all-time": "All Time",
+};
 
 export default function LeaderboardScreen() {
   const { data: groups } = useMyGroups();
@@ -37,8 +45,10 @@ export default function LeaderboardScreen() {
 
   if (!groups?.length) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">Join a group to see leaderboards</Text>
+      <View className="flex-1 items-center justify-center px-8">
+        <Text className="text-center text-base text-gray-500">
+          Join a group to see leaderboards
+        </Text>
       </View>
     );
   }
@@ -46,14 +56,14 @@ export default function LeaderboardScreen() {
   return (
     <View className="flex-1">
       {/* Group selector */}
-      <FlatList
+      <ScrollView
         horizontal
-        data={groups}
-        keyExtractor={(item) => item.id}
         showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2 px-4 py-2"
-        renderItem={({ item }) => (
+        contentContainerClassName="gap-2 px-4 py-3"
+      >
+        {groups.map((item) => (
           <Pressable
+            key={item.id}
             className={`rounded-full px-4 py-2 ${
               groupId === item.id
                 ? "bg-blue-600"
@@ -69,27 +79,27 @@ export default function LeaderboardScreen() {
               {item.name}
             </Text>
           </Pressable>
-        )}
-      />
+        ))}
+      </ScrollView>
 
-      {/* View toggle */}
-      <View className="flex-row border-b border-gray-200 dark:border-gray-700">
+      {/* Segmented control */}
+      <View className="mx-4 mb-3 flex-row rounded-xl bg-gray-200 p-1 dark:bg-gray-700">
         <Pressable
-          className={`flex-1 py-3 ${view === "leaderboard" ? "border-b-2 border-blue-600" : ""}`}
+          className={`flex-1 rounded-lg py-2.5 ${view === "leaderboard" ? "bg-white shadow-sm dark:bg-gray-600" : ""}`}
           onPress={() => setView("leaderboard")}
         >
           <Text
-            className={`text-center font-medium ${view === "leaderboard" ? "text-blue-600" : "text-gray-500"}`}
+            className={`text-center text-sm font-semibold ${view === "leaderboard" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}
           >
             Leaderboard
           </Text>
         </Pressable>
         <Pressable
-          className={`flex-1 py-3 ${view === "compliance" ? "border-b-2 border-blue-600" : ""}`}
+          className={`flex-1 rounded-lg py-2.5 ${view === "compliance" ? "bg-white shadow-sm dark:bg-gray-600" : ""}`}
           onPress={() => setView("compliance")}
         >
           <Text
-            className={`text-center font-medium ${view === "compliance" ? "text-blue-600" : "text-gray-500"}`}
+            className={`text-center text-sm font-semibold ${view === "compliance" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}
           >
             Compliance
           </Text>
@@ -98,16 +108,12 @@ export default function LeaderboardScreen() {
 
       {view === "leaderboard" ? (
         <>
-          {/* Period selector */}
-          <FlatList
-            horizontal
-            data={PERIODS}
-            keyExtractor={(item) => item}
-            showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-2 px-4 py-2"
-            renderItem={({ item }) => (
+          {/* Period pills */}
+          <View className="mx-4 mb-3 flex-row gap-2">
+            {PERIODS.map((item) => (
               <Pressable
-                className={`rounded-full px-3 py-1.5 ${
+                key={item}
+                className={`rounded-full px-3.5 py-1.5 ${
                   period === item
                     ? "bg-blue-600"
                     : "bg-gray-100 dark:bg-gray-700"
@@ -115,15 +121,15 @@ export default function LeaderboardScreen() {
                 onPress={() => setPeriod(item)}
               >
                 <Text
-                  className={`text-xs font-medium capitalize ${
-                    period === item ? "text-white" : "dark:text-white"
+                  className={`text-xs font-medium ${
+                    period === item ? "text-white" : "text-gray-600 dark:text-gray-300"
                   }`}
                 >
-                  {item}
+                  {PERIOD_LABELS[item]}
                 </Text>
               </Pressable>
-            )}
-          />
+            ))}
+          </View>
 
           {lbLoading ? (
             <ActivityIndicator className="mt-8" />
@@ -131,15 +137,18 @@ export default function LeaderboardScreen() {
             <FlatList
               data={leaderboard}
               keyExtractor={(item) => item.userId}
-              contentContainerClassName="p-4"
+              contentContainerClassName="px-4 pb-4"
               ListEmptyComponent={
-                <Text className="text-center text-gray-500">
-                  No workouts logged yet
-                </Text>
+                <View className="items-center py-16">
+                  <Text className="text-base text-gray-500">
+                    No workouts logged yet
+                  </Text>
+                </View>
               }
               renderItem={({ item, index }) => (
                 <LeaderboardRow entry={item} rank={index + 1} />
               )}
+              ItemSeparatorComponent={() => <View className="h-2" />}
             />
           )}
         </>
@@ -149,22 +158,16 @@ export default function LeaderboardScreen() {
         <FlatList
           data={compliance}
           keyExtractor={(item) => item.userId}
-          contentContainerClassName="p-4"
-          renderItem={({ item }) => (
-            <View className="mb-2 flex-row items-center rounded-lg bg-white p-3 dark:bg-gray-800">
-              <View
-                className={`mr-3 h-3 w-3 rounded-full ${item.isCompliant ? "bg-green-500" : "bg-red-500"}`}
-              />
-              <View className="flex-1">
-                <Text className="font-medium dark:text-white">
-                  {item.displayName ?? item.username}
-                </Text>
-              </View>
-              <Text className="text-sm text-gray-500">
-                {item.qualifiedCount}/{item.required}
+          contentContainerClassName="px-4 pb-4"
+          ListEmptyComponent={
+            <View className="items-center py-16">
+              <Text className="text-base text-gray-500">
+                No members found
               </Text>
             </View>
-          )}
+          }
+          renderItem={({ item }) => <ComplianceRow entry={item} />}
+          ItemSeparatorComponent={() => <View className="h-2" />}
         />
       )}
     </View>
@@ -179,24 +182,73 @@ function LeaderboardRow({
   rank: number;
 }) {
   const medals = ["🥇", "🥈", "🥉"];
+  const isTop3 = rank <= 3;
 
   return (
-    <View className="mb-2 flex-row items-center rounded-lg bg-white p-3 dark:bg-gray-800">
-      <Text className="mr-3 w-8 text-center text-lg font-bold">
-        {rank <= 3 ? medals[rank - 1] : rank}
-      </Text>
+    <View className="flex-row items-center rounded-xl bg-white p-3.5 shadow-sm dark:bg-gray-800">
+      <View className="mr-3 w-9 items-center">
+        {isTop3 ? (
+          <Text className="text-xl">{medals[rank - 1]}</Text>
+        ) : (
+          <Text className="text-base font-bold text-gray-400">{rank}</Text>
+        )}
+      </View>
       <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
         <FontAwesome name="user" size={16} color="#3b82f6" />
       </View>
       <View className="flex-1">
-        <Text className="font-medium dark:text-white">
+        <Text className="font-semibold dark:text-white">
           {entry.displayName ?? entry.username}
         </Text>
-        <Text className="text-xs text-gray-500">
+        <Text className="mt-0.5 text-xs text-gray-500">
           {entry.totalQualifiedWorkouts} qualified &middot;{" "}
-          {entry.totalMinutes} min total &middot; avg {entry.avgMinutes} min
+          {entry.totalMinutes} min &middot; avg {entry.avgMinutes} min
         </Text>
       </View>
+    </View>
+  );
+}
+
+function ComplianceRow({
+  entry,
+}: {
+  entry: {
+    userId: string;
+    username: string;
+    displayName: string | null;
+    qualifiedCount: number;
+    required: number;
+    isCompliant: boolean;
+  };
+}) {
+  const progress = Math.min(entry.qualifiedCount / Math.max(entry.required, 1), 1);
+
+  return (
+    <View className="flex-row items-center rounded-xl bg-white p-3.5 shadow-sm dark:bg-gray-800">
+      <View
+        className={`mr-3 h-3 w-3 rounded-full ${entry.isCompliant ? "bg-green-500" : "bg-red-400"}`}
+      />
+      <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+        <FontAwesome name="user" size={16} color="#3b82f6" />
+      </View>
+      <View className="flex-1">
+        <Text className="font-semibold dark:text-white">
+          {entry.displayName ?? entry.username}
+        </Text>
+        {/* Mini progress bar */}
+        <View className="mt-1.5 h-1.5 rounded-full bg-gray-200 dark:bg-gray-600">
+          <View
+            className={`h-1.5 rounded-full ${entry.isCompliant ? "bg-green-500" : "bg-red-400"}`}
+            style={{ width: `${progress * 100}%` }}
+          />
+        </View>
+      </View>
+      <Text className="ml-3 text-base font-semibold dark:text-white">
+        {entry.qualifiedCount}
+        <Text className="text-sm font-normal text-gray-400">
+          /{entry.required}
+        </Text>
+      </Text>
     </View>
   );
 }

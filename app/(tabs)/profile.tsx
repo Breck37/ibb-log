@@ -1,20 +1,22 @@
+import { Button, Input } from "@/components/ui/";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
   Pressable,
-  ScrollView,
   Text,
   View,
 } from "react-native";
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { WorkoutCard } from "@/components/workoutCard";
 import { useMyGroups } from "@/lib/hooks/use-groups";
+import { useUserStats } from "@/lib/hooks/use-stats";
+import { useMyWorkouts } from "@/lib/hooks/use-workouts";
 import { pickSingleImage, uploadAvatar } from "@/lib/services/image-upload";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/auth-provider";
@@ -45,6 +47,8 @@ export default function ProfileScreen() {
   });
 
   const { data: groups } = useMyGroups();
+  const { data: workouts } = useMyWorkouts();
+  const { data: stats } = useUserStats();
 
   const handleStartEditing = () => {
     setDisplayName(profile?.display_name ?? "");
@@ -127,8 +131,8 @@ export default function ProfileScreen() {
       })
     : null;
 
-  return (
-    <ScrollView className="flex-1" contentContainerClassName="p-4">
+  const profileHeader = (
+    <>
       <View className="mb-6 items-center">
         <Pressable onPress={handleAvatarPress} className="mb-3">
           {isUploadingAvatar ? (
@@ -224,6 +228,27 @@ export default function ProfileScreen() {
         )}
       </View>
 
+      {stats && stats.totalWorkouts > 0 && (
+        <View className="mb-6">
+          <Text className="mb-2 text-sm font-semibold text-gray-500">
+            Stats
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <StatTile label="Workouts" value={stats.totalWorkouts} />
+            <StatTile
+              label="Total hrs"
+              value={`${Math.floor(stats.totalMinutes / 60)}h ${stats.totalMinutes % 60}m`}
+            />
+            <StatTile label="Avg min" value={stats.avgMinutes} />
+            <StatTile label="Longest" value={`${stats.longestWorkout}m`} />
+            <StatTile label="This week" value={stats.thisWeekCount} />
+            <StatTile label="This month" value={stats.thisMonthCount} />
+            <StatTile label="Streak" value={`${stats.currentStreak}w`} />
+            <StatTile label="Best streak" value={`${stats.bestStreak}w`} />
+          </View>
+        </View>
+      )}
+
       {groups && groups.length > 0 && (
         <View className="mb-6">
           <Text className="mb-2 text-sm font-semibold text-gray-500">
@@ -241,11 +266,45 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      <Button
-        variant="danger"
-        title="Sign Out"
+      <Pressable
+        className="mb-6 rounded-lg border border-red-300 py-3 active:bg-red-50"
         onPress={handleSignOut}
-      />
-    </ScrollView>
+      >
+        <Text className="text-center font-medium text-red-600">Sign Out</Text>
+      </Pressable>
+
+      {workouts && workouts.length > 0 && (
+        <Text className="mb-2 text-sm font-semibold text-gray-500">
+          Your Workouts
+        </Text>
+      )}
+    </>
+  );
+
+  return (
+    <FlatList
+      className="flex-1"
+      contentContainerClassName="p-4"
+      data={workouts ?? []}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={profileHeader}
+      ListEmptyComponent={
+        <View className="items-center py-8">
+          <Text className="text-gray-400">No workouts yet</Text>
+        </View>
+      }
+      renderItem={({ item }) => <WorkoutCard workout={item} />}
+    />
+  );
+}
+
+function StatTile({ label, value }: { label: string; value: string | number }) {
+  return (
+    <View className="min-w-[22%] flex-1 items-center rounded-lg bg-white p-3 shadow-sm dark:bg-gray-800">
+      <Text className="text-lg font-bold text-blue-600 dark:text-blue-400">
+        {value}
+      </Text>
+      <Text className="text-xs text-gray-500">{label}</Text>
+    </View>
   );
 }
