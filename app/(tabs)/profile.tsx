@@ -15,6 +15,7 @@ import {
 
 import { WorkoutCard } from "@/components/workoutCard";
 import { useMyGroups } from "@/lib/hooks/use-groups";
+import { useUserStats } from "@/lib/hooks/use-stats";
 import { useMyWorkouts } from "@/lib/hooks/use-workouts";
 import { pickSingleImage, uploadAvatar } from "@/lib/services/image-upload";
 import { supabase } from "@/lib/supabase";
@@ -47,6 +48,7 @@ export default function ProfileScreen() {
 
   const { data: groups } = useMyGroups();
   const { data: workouts } = useMyWorkouts();
+  const { data: stats } = useUserStats();
 
   const handleStartEditing = () => {
     setDisplayName(profile?.display_name ?? "");
@@ -232,6 +234,27 @@ export default function ProfileScreen() {
         )}
       </View>
 
+      {stats && stats.totalWorkouts > 0 && (
+        <View className="mb-6">
+          <Text className="mb-2 text-sm font-semibold text-gray-500">
+            Stats
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <StatTile label="Workouts" value={stats.totalWorkouts} />
+            <StatTile
+              label="Total hrs"
+              value={`${Math.floor(stats.totalMinutes / 60)}h ${stats.totalMinutes % 60}m`}
+            />
+            <StatTile label="Avg min" value={stats.avgMinutes} />
+            <StatTile label="Longest" value={`${stats.longestWorkout}m`} />
+            <StatTile label="This week" value={stats.thisWeekCount} />
+            <StatTile label="This month" value={stats.thisMonthCount} />
+            <StatTile label="Streak" value={`${stats.currentStreak}w`} />
+            <StatTile label="Best streak" value={`${stats.bestStreak}w`} />
+          </View>
+        </View>
+      )}
+
       {groups && groups.length > 0 && (
         <View className="mb-6">
           <Text className="mb-2 text-sm font-semibold text-gray-500">
@@ -278,5 +301,22 @@ export default function ProfileScreen() {
       }
       renderItem={({ item }) => <WorkoutCard workout={item} />}
     />
+  );
+}
+
+function StatTile({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <View className="min-w-[22%] flex-1 items-center rounded-lg bg-white p-3 shadow-sm dark:bg-gray-800">
+      <Text className="text-lg font-bold text-blue-600 dark:text-blue-400">
+        {value}
+      </Text>
+      <Text className="text-xs text-gray-500">{label}</Text>
+    </View>
   );
 }
