@@ -1,4 +1,4 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { User } from 'phosphor-react-native';
 import { Image, ScrollView, Text, View } from 'react-native';
 
 import type { FeedWorkout } from '@/lib/hooks/use-workouts';
@@ -16,7 +16,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
     <View className="mb-3 rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
       <View className="mb-2 flex-row items-center">
         <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-          <FontAwesome name="user" size={16} color="#3b82f6" />
+          <User size={16} color="#3b82f6" weight="fill" />
         </View>
         <View className="flex-1">
           <Text className="font-semibold dark:text-white">{displayName}</Text>
