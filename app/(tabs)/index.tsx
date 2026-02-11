@@ -1,12 +1,7 @@
 import { Link } from "expo-router";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
+import { Button } from "@/components/ui/Button";
 import { WorkoutCard } from "@/components/workoutCard";
 import { useFeedWorkouts } from "@/lib/hooks/use-workouts";
 
@@ -42,9 +37,7 @@ export default function FeedScreen() {
             <Text className="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">
               No workouts yet
             </Text>
-            <Text className="text-gray-400">
-              Log one to get started
-            </Text>
+            <Text className="text-gray-400">Log one to get started</Text>
           </View>
         }
         ListHeaderComponent={
@@ -58,20 +51,16 @@ export default function FeedScreen() {
               </Text>
             </View>
             <View className="flex-row gap-3">
-            <Link href="/group/create" asChild>
-              <Pressable className="flex-1 rounded-lg bg-blue-600 py-3 active:bg-blue-700">
-                <Text className="text-center font-semibold text-white">
-                  Create Group
-                </Text>
-              </Pressable>
-            </Link>
-            <Link href="/group/join" asChild>
-              <Pressable className="flex-1 rounded-lg border border-blue-600 py-3 active:bg-blue-50">
-                <Text className="text-center font-semibold text-blue-600">
-                  Join Group
-                </Text>
-              </Pressable>
-            </Link>
+              <Link href="/group/create" asChild>
+                <Button className="flex-1" title="Create Group" />
+              </Link>
+              <Link href="/group/join" asChild>
+                <Button
+                  className="flex-1"
+                  variant="outline"
+                  title="Join Group"
+                />
+              </Link>
             </View>
           </View>
         }
