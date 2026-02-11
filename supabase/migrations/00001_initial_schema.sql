@@ -9,6 +9,11 @@ drop schema public cascade;
 create schema public;
 grant all on schema public to postgres, anon, authenticated, service_role;
 
+-- Grant table-level permissions so authenticated/anon roles can access tables.
+-- (RLS policies still control which rows are visible.)
+alter default privileges in schema public grant select, insert, update, delete on tables to authenticated;
+alter default privileges in schema public grant select, insert, update, delete on tables to anon;
+
 -- ============================================================================
 -- Utility Functions (no table dependencies)
 -- ============================================================================
