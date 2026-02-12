@@ -1,6 +1,6 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
+import { PaperPlaneRight, User } from 'phosphor-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -12,13 +12,13 @@ import {
   View,
 } from 'react-native';
 
-import { supabase } from '@/lib/supabase';
 import {
   useAddComment,
   useComments,
   useReactions,
   useToggleReaction,
 } from '@/lib/hooks/use-social';
+import { supabase } from '@/lib/supabase';
 
 const REACTION_EMOJIS = ['💪', '🔥', '👏', '🎯', '⭐'];
 
@@ -89,7 +89,7 @@ export default function WorkoutDetailScreen() {
         <View className="mb-4 rounded-lg bg-white p-4 dark:bg-gray-800">
           <View className="mb-3 flex-row items-center">
             <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <FontAwesome name="user" size={20} color="#3b82f6" />
+              <User size={20} color="#3b82f6" weight="fill" />
             </View>
             <View className="flex-1">
               <Text className="text-lg font-semibold dark:text-white">
@@ -206,7 +206,7 @@ export default function WorkoutDetailScreen() {
             onPress={handleComment}
             disabled={addComment.isPending || !commentText.trim()}
           >
-            <FontAwesome name="send" size={16} color="white" />
+            <PaperPlaneRight size={16} color="white" weight="fill" />
           </Pressable>
         </View>
       </ScrollView>

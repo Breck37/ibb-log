@@ -1,6 +1,6 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { GearSix, User } from 'phosphor-react-native';
 import {
   ActivityIndicator,
   Pressable,
@@ -9,8 +9,8 @@ import {
   View,
 } from 'react-native';
 
-import { supabase } from '@/lib/supabase';
 import { useGroupMembers } from '@/lib/hooks/use-groups';
+import { supabase } from '@/lib/supabase';
 
 export default function GroupDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -55,7 +55,7 @@ export default function GroupDetailScreen() {
           headerRight: () => (
             <Link href="/group/settings" asChild>
               <Pressable className="p-2">
-                <FontAwesome name="gear" size={20} color="#666" />
+                <GearSix size={20} color="#666" weight="regular" />
               </Pressable>
             </Link>
           ),
@@ -84,7 +84,7 @@ export default function GroupDetailScreen() {
             className="mb-2 flex-row items-center rounded-lg bg-white p-3 dark:bg-gray-800"
           >
             <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-              <FontAwesome name="user" size={16} color="#3b82f6" />
+              <User size={16} color="#3b82f6" weight="fill" />
             </View>
             <View className="flex-1">
               <Text className="font-medium dark:text-white">
