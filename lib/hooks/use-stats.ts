@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from "@/lib/supabase";
-import { getWeekKey } from "@/lib/week-key";
+import { supabase } from '@/lib/supabase';
+import { getWeekKey } from '@/lib/week-key';
 
 export type UserStats = {
   totalWorkouts: number;
@@ -21,18 +21,20 @@ export type UserStats = {
  */
 export function useUserStats() {
   return useQuery({
-    queryKey: ["workouts", "stats"],
+    queryKey: ['workouts', 'stats'],
     queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
-        .from("workouts")
-        .select("duration_minutes, created_at, group_workouts(week_key, is_qualified)")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .from('workouts')
+        .select(
+          'duration_minutes, created_at, group_workouts(week_key, is_qualified)',
+        )
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -153,7 +155,7 @@ function generateWeekRange(start: string, end: string): string[] {
   const [endYear, endWeekNum] = parseWeekKey(end);
 
   while (year < endYear || (year === endYear && weekNum <= endWeekNum)) {
-    weeks.push(`${year}-W${String(weekNum).padStart(2, "0")}`);
+    weeks.push(`${year}-W${String(weekNum).padStart(2, '0')}`);
     weekNum++;
     const maxWeeks = getISOWeeksInYear(year);
     if (weekNum > maxWeeks) {
@@ -166,7 +168,7 @@ function generateWeekRange(start: string, end: string): string[] {
 }
 
 function parseWeekKey(key: string): [number, number] {
-  const [yearStr, weekStr] = key.split("-W");
+  const [yearStr, weekStr] = key.split('-W');
   return [parseInt(yearStr, 10), parseInt(weekStr, 10)];
 }
 

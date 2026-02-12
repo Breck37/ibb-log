@@ -22,17 +22,17 @@ Every stat — streaks, totals, averages, personal records, group rankings — c
 
 Fetches all user workouts in a single query and computes stats client-side:
 
-| Stat | How |
-|---|---|
-| Total workouts | `workouts.length` |
-| Total minutes | Sum of `duration_minutes` |
-| Avg minutes | `totalMinutes / totalWorkouts` |
-| Longest workout | Max `duration_minutes` |
-| This week count | Filter by current ISO week key |
-| This month count | Filter by current month start |
-| Current streak | Walk backwards from current week through qualified week keys |
-| Best streak | Max consecutive qualified weeks across all time |
-| Day distribution | Count workouts by `getDay()` — ready for a heatmap UI later |
+| Stat             | How                                                          |
+| ---------------- | ------------------------------------------------------------ |
+| Total workouts   | `workouts.length`                                            |
+| Total minutes    | Sum of `duration_minutes`                                    |
+| Avg minutes      | `totalMinutes / totalWorkouts`                               |
+| Longest workout  | Max `duration_minutes`                                       |
+| This week count  | Filter by current ISO week key                               |
+| This month count | Filter by current month start                                |
+| Current streak   | Walk backwards from current week through qualified week keys |
+| Best streak      | Max consecutive qualified weeks across all time              |
+| Day distribution | Count workouts by `getDay()` — ready for a heatmap UI later  |
 
 Displayed on the Profile screen as a stat tile grid.
 
@@ -107,6 +107,7 @@ FOR EACH ROW EXECUTE FUNCTION update_user_stats_on_workout();
 ```
 
 Streaks are the exception — they can't be incrementally updated with a simple trigger. Options:
+
 1. Recompute streaks on read (hybrid: cache everything except streaks)
 2. A scheduled Supabase Edge Function that runs weekly to update streak values
 3. A more complex trigger that walks the week keys (not worth the complexity early on)
@@ -114,6 +115,7 @@ Streaks are the exception — they can't be incrementally updated with a simple 
 **Option B: Supabase Edge Function cron (recommended for streaks + group stats)**
 
 A weekly Edge Function that:
+
 1. Iterates all users, computes current/best streak from `group_workouts.week_key`
 2. Computes group-level stats (compliance rate, group streak)
 3. Upserts into `user_stats_cache` and `group_stats_cache`
@@ -139,6 +141,7 @@ Run on Sunday night after the week closes. Latency doesn't matter for cached sta
 No new tables needed. The recap is a read-only view over existing data, filtered to a calendar year. The materialized cache speeds it up but isn't required.
 
 **Individual recap query shape:**
+
 ```sql
 SELECT
   count(*) as total_workouts,

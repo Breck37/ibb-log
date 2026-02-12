@@ -1,7 +1,7 @@
-import type { ImagePickerAsset } from "expo-image-picker";
+import type { ImagePickerAsset } from 'expo-image-picker';
 
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   Alert,
   Image,
@@ -11,13 +11,13 @@ import {
   ScrollView,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { Input } from "@/components/ui/Input";
-import { WorkoutCard } from "@/components/workoutCard";
-import { useMyGroups } from "@/lib/hooks/use-groups";
-import { useCreateWorkout, useMyWorkouts } from "@/lib/hooks/use-workouts";
-import { pickImages } from "@/lib/services/image-upload";
+import { Input } from '@/components/ui/Input';
+import { WorkoutCard } from '@/components/workoutCard';
+import { useMyGroups } from '@/lib/hooks/use-groups';
+import { useCreateWorkout, useMyWorkouts } from '@/lib/hooks/use-workouts';
+import { pickImages } from '@/lib/services/image-upload';
 
 export default function LogScreen() {
   const router = useRouter();
@@ -26,9 +26,9 @@ export default function LogScreen() {
   const { data: recentWorkouts } = useMyWorkouts(5);
 
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
-  const [duration, setDuration] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [duration, setDuration] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [images, setImages] = useState<ImagePickerAsset[]>([]);
 
   // Auto-select all groups when they load and none are selected yet
@@ -60,15 +60,15 @@ export default function LogScreen() {
 
   const handleSubmit = async () => {
     if (!duration || parseInt(duration, 10) <= 0) {
-      Alert.alert("Error", "Please enter a valid duration");
+      Alert.alert('Error', 'Please enter a valid duration');
       return;
     }
     if (!title.trim()) {
-      Alert.alert("Error", "Please enter a title");
+      Alert.alert('Error', 'Please enter a title');
       return;
     }
     if (images.length === 0) {
-      Alert.alert("Error", "Please add at least one photo");
+      Alert.alert('Error', 'Please add at least one photo');
       return;
     }
 
@@ -81,17 +81,17 @@ export default function LogScreen() {
         images,
       });
 
-      Alert.alert("Success", "Workout logged!");
-      setDuration("");
-      setTitle("");
-      setDescription("");
+      Alert.alert('Success', 'Workout logged!');
+      setDuration('');
+      setTitle('');
+      setDescription('');
       setImages([]);
       setSelectedGroupIds([]);
-      router.navigate("/(tabs)");
+      router.navigate('/(tabs)');
     } catch (error) {
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to log workout",
+        'Error',
+        error instanceof Error ? error.message : 'Failed to log workout',
       );
     }
   };
@@ -100,7 +100,7 @@ export default function LogScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <ScrollView
@@ -124,16 +124,16 @@ export default function LogScreen() {
                   key={group.id}
                   className={`rounded-full px-4 py-2 ${
                     effectiveGroupIds.includes(group.id)
-                      ? "bg-blue-600"
-                      : "bg-gray-200 dark:bg-gray-700"
+                      ? 'bg-blue-600'
+                      : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                   onPress={() => toggleGroup(group.id)}
                 >
                   <Text
                     className={`text-sm font-medium ${
                       effectiveGroupIds.includes(group.id)
-                        ? "text-white"
-                        : "dark:text-white"
+                        ? 'text-white'
+                        : 'dark:text-white'
                     }`}
                   >
                     {group.name}
@@ -199,7 +199,7 @@ export default function LogScreen() {
 
         <Pressable onPress={handleSubmit} disabled={createWorkout.isPending}>
           <Text className="text-center text-base font-semibold text-white">
-            {createWorkout.isPending ? "Logging..." : "Log Workout"}
+            {createWorkout.isPending ? 'Logging...' : 'Log Workout'}
           </Text>
         </Pressable>
 

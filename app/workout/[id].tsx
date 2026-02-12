@@ -1,7 +1,7 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useQuery } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useQuery } from '@tanstack/react-query';
+import { Stack, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -10,31 +10,31 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from '@/lib/supabase';
 import {
   useAddComment,
   useComments,
   useReactions,
   useToggleReaction,
-} from "@/lib/hooks/use-social";
+} from '@/lib/hooks/use-social';
 
-const REACTION_EMOJIS = ["💪", "🔥", "👏", "🎯", "⭐"];
+const REACTION_EMOJIS = ['💪', '🔥', '👏', '🎯', '⭐'];
 
 export default function WorkoutDetailScreen() {
   const { id: groupWorkoutId } = useLocalSearchParams<{ id: string }>();
-  const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState('');
 
   const { data: groupWorkout, isLoading } = useQuery({
-    queryKey: ["group-workout", groupWorkoutId],
+    queryKey: ['group-workout', groupWorkoutId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("group_workouts")
+        .from('group_workouts')
         .select(
-          "*, workouts(*, profiles(username, display_name, avatar_url)), groups(name)",
+          '*, workouts(*, profiles(username, display_name, avatar_url)), groups(name)',
         )
-        .eq("id", groupWorkoutId)
+        .eq('id', groupWorkoutId)
         .single();
       if (error) throw error;
       return data;
@@ -50,7 +50,7 @@ export default function WorkoutDetailScreen() {
   const handleComment = async () => {
     if (!commentText.trim()) return;
     await addComment.mutateAsync({ body: commentText.trim() });
-    setCommentText("");
+    setCommentText('');
   };
 
   if (isLoading) {
@@ -80,7 +80,7 @@ export default function WorkoutDetailScreen() {
   );
 
   const displayName =
-    workout.profiles?.display_name ?? workout.profiles?.username ?? "Unknown";
+    workout.profiles?.display_name ?? workout.profiles?.username ?? 'Unknown';
 
   return (
     <>
@@ -155,8 +155,8 @@ export default function WorkoutDetailScreen() {
               key={emoji}
               className={`flex-row items-center rounded-full px-3 py-1.5 ${
                 reactionGroups[emoji]
-                  ? "bg-blue-100 dark:bg-blue-900"
-                  : "bg-gray-100 dark:bg-gray-700"
+                  ? 'bg-blue-100 dark:bg-blue-900'
+                  : 'bg-gray-100 dark:bg-gray-700'
               }`}
               onPress={() => toggleReaction.mutate(emoji)}
             >
@@ -179,7 +179,7 @@ export default function WorkoutDetailScreen() {
           <View
             key={comment.id}
             className={`mb-2 rounded-lg bg-white p-3 dark:bg-gray-800 ${
-              comment.parent_id ? "ml-8" : ""
+              comment.parent_id ? 'ml-8' : ''
             }`}
           >
             <Text className="text-xs font-medium text-blue-600">

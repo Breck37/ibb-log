@@ -1,5 +1,5 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useState } from "react";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -7,34 +7,31 @@ import {
   ScrollView,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { useMyGroups } from "@/lib/hooks/use-groups";
+import { useMyGroups } from '@/lib/hooks/use-groups';
 import {
   useLeaderboard,
   useWeeklyCompliance,
   type LeaderboardEntry,
-} from "@/lib/hooks/use-compliance";
+} from '@/lib/hooks/use-compliance';
 
-const PERIODS = ["weekly", "monthly", "yearly", "all-time"] as const;
+const PERIODS = ['weekly', 'monthly', 'yearly', 'all-time'] as const;
 
 const PERIOD_LABELS: Record<(typeof PERIODS)[number], string> = {
-  weekly: "Week",
-  monthly: "Month",
-  yearly: "Year",
-  "all-time": "All Time",
+  weekly: 'Week',
+  monthly: 'Month',
+  yearly: 'Year',
+  'all-time': 'All Time',
 };
 
 export default function LeaderboardScreen() {
   const { data: groups } = useMyGroups();
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [period, setPeriod] =
-    useState<(typeof PERIODS)[number]>("weekly");
-  const [view, setView] = useState<"leaderboard" | "compliance">(
-    "leaderboard",
-  );
+  const [period, setPeriod] = useState<(typeof PERIODS)[number]>('weekly');
+  const [view, setView] = useState<'leaderboard' | 'compliance'>('leaderboard');
 
-  const groupId = selectedGroupId ?? groups?.[0]?.id ?? "";
+  const groupId = selectedGroupId ?? groups?.[0]?.id ?? '';
 
   const { data: leaderboard, isLoading: lbLoading } = useLeaderboard(
     groupId,
@@ -66,14 +63,14 @@ export default function LeaderboardScreen() {
             key={item.id}
             className={`rounded-full px-4 py-2 ${
               groupId === item.id
-                ? "bg-blue-600"
-                : "bg-gray-200 dark:bg-gray-700"
+                ? 'bg-blue-600'
+                : 'bg-gray-200 dark:bg-gray-700'
             }`}
             onPress={() => setSelectedGroupId(item.id)}
           >
             <Text
               className={`text-sm font-medium ${
-                groupId === item.id ? "text-white" : "dark:text-white"
+                groupId === item.id ? 'text-white' : 'dark:text-white'
               }`}
             >
               {item.name}
@@ -85,28 +82,28 @@ export default function LeaderboardScreen() {
       {/* Segmented control */}
       <View className="mx-4 mb-3 flex-row rounded-xl bg-gray-200 p-1 dark:bg-gray-700">
         <Pressable
-          className={`flex-1 rounded-lg py-2.5 ${view === "leaderboard" ? "bg-white shadow-sm dark:bg-gray-600" : ""}`}
-          onPress={() => setView("leaderboard")}
+          className={`flex-1 rounded-lg py-2.5 ${view === 'leaderboard' ? 'bg-white shadow-sm dark:bg-gray-600' : ''}`}
+          onPress={() => setView('leaderboard')}
         >
           <Text
-            className={`text-center text-sm font-semibold ${view === "leaderboard" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}
+            className={`text-center text-sm font-semibold ${view === 'leaderboard' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}
           >
             Leaderboard
           </Text>
         </Pressable>
         <Pressable
-          className={`flex-1 rounded-lg py-2.5 ${view === "compliance" ? "bg-white shadow-sm dark:bg-gray-600" : ""}`}
-          onPress={() => setView("compliance")}
+          className={`flex-1 rounded-lg py-2.5 ${view === 'compliance' ? 'bg-white shadow-sm dark:bg-gray-600' : ''}`}
+          onPress={() => setView('compliance')}
         >
           <Text
-            className={`text-center text-sm font-semibold ${view === "compliance" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}
+            className={`text-center text-sm font-semibold ${view === 'compliance' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}
           >
             Compliance
           </Text>
         </Pressable>
       </View>
 
-      {view === "leaderboard" ? (
+      {view === 'leaderboard' ? (
         <>
           {/* Period pills */}
           <View className="mx-4 mb-3 flex-row gap-2">
@@ -115,14 +112,16 @@ export default function LeaderboardScreen() {
                 key={item}
                 className={`rounded-full px-3.5 py-1.5 ${
                   period === item
-                    ? "bg-blue-600"
-                    : "bg-gray-100 dark:bg-gray-700"
+                    ? 'bg-blue-600'
+                    : 'bg-gray-100 dark:bg-gray-700'
                 }`}
                 onPress={() => setPeriod(item)}
               >
                 <Text
                   className={`text-xs font-medium ${
-                    period === item ? "text-white" : "text-gray-600 dark:text-gray-300"
+                    period === item
+                      ? 'text-white'
+                      : 'text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {PERIOD_LABELS[item]}
@@ -161,9 +160,7 @@ export default function LeaderboardScreen() {
           contentContainerClassName="px-4 pb-4"
           ListEmptyComponent={
             <View className="items-center py-16">
-              <Text className="text-base text-gray-500">
-                No members found
-              </Text>
+              <Text className="text-base text-gray-500">No members found</Text>
             </View>
           }
           renderItem={({ item }) => <ComplianceRow entry={item} />}
@@ -181,7 +178,7 @@ function LeaderboardRow({
   entry: LeaderboardEntry;
   rank: number;
 }) {
-  const medals = ["🥇", "🥈", "🥉"];
+  const medals = ['🥇', '🥈', '🥉'];
   const isTop3 = rank <= 3;
 
   return (
@@ -201,8 +198,8 @@ function LeaderboardRow({
           {entry.displayName ?? entry.username}
         </Text>
         <Text className="mt-0.5 text-xs text-gray-500">
-          {entry.totalQualifiedWorkouts} qualified &middot;{" "}
-          {entry.totalMinutes} min &middot; avg {entry.avgMinutes} min
+          {entry.totalQualifiedWorkouts} qualified &middot; {entry.totalMinutes}{' '}
+          min &middot; avg {entry.avgMinutes} min
         </Text>
       </View>
     </View>
@@ -221,12 +218,15 @@ function ComplianceRow({
     isCompliant: boolean;
   };
 }) {
-  const progress = Math.min(entry.qualifiedCount / Math.max(entry.required, 1), 1);
+  const progress = Math.min(
+    entry.qualifiedCount / Math.max(entry.required, 1),
+    1,
+  );
 
   return (
     <View className="flex-row items-center rounded-xl bg-white p-3.5 shadow-sm dark:bg-gray-800">
       <View
-        className={`mr-3 h-3 w-3 rounded-full ${entry.isCompliant ? "bg-green-500" : "bg-red-400"}`}
+        className={`mr-3 h-3 w-3 rounded-full ${entry.isCompliant ? 'bg-green-500' : 'bg-red-400'}`}
       />
       <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
         <FontAwesome name="user" size={16} color="#3b82f6" />
@@ -238,7 +238,7 @@ function ComplianceRow({
         {/* Mini progress bar */}
         <View className="mt-1.5 h-1.5 rounded-full bg-gray-200 dark:bg-gray-600">
           <View
-            className={`h-1.5 rounded-full ${entry.isCompliant ? "bg-green-500" : "bg-red-400"}`}
+            className={`h-1.5 rounded-full ${entry.isCompliant ? 'bg-green-500' : 'bg-red-400'}`}
             style={{ width: `${progress * 100}%` }}
           />
         </View>

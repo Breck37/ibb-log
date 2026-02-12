@@ -12,5 +12,5 @@ export function getWeekKey(date: Date = new Date()): string {
   const weekNo = Math.ceil(
     ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
   );
-  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }

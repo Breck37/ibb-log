@@ -9,7 +9,13 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "db:migrate": "npx supabase db push",
-    "db:gen-types": "npx supabase gen types typescript --linked > lib/database.types.ts"
+    "db:gen-types": "npx supabase gen types typescript --linked > lib/database.types.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -41,9 +47,13 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.39.2",
     "eslint-config-expo": "~10.0.0",
+    "jest": "^30.2.0",
+    "jest-expo": "^54.0.17",
+    "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "react-test-renderer": "19.1.0",
     "tailwindcss": "^3.4.19",

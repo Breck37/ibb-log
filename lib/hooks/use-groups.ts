@@ -1,20 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from '@/lib/supabase';
 
-import type { Database } from "@/lib/database.types";
+import type { Database } from '@/lib/database.types';
 
-type Group = Database["public"]["Tables"]["groups"]["Row"];
-type GroupInsert = Database["public"]["Tables"]["groups"]["Insert"];
+type Group = Database['public']['Tables']['groups']['Row'];
+type GroupInsert = Database['public']['Tables']['groups']['Insert'];
 
 export function useMyGroups() {
   return useQuery({
-    queryKey: ["groups"],
+    queryKey: ['groups'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("groups")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .from('groups')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data;
@@ -29,17 +29,17 @@ export function useCreateGroup() {
     mutationFn: async (
       input: Pick<
         GroupInsert,
-        "name" | "min_workouts_per_week" | "min_workout_minutes_to_qualify"
+        'name' | 'min_workouts_per_week' | 'min_workout_minutes_to_qualify'
       >,
     ) => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log("!", { user });
-      if (!user) throw new Error("Not authenticated");
+      console.log('!', { user });
+      if (!user) throw new Error('Not authenticated');
 
       const { data: group, error: groupError } = await supabase
-        .from("groups")
+        .from('groups')
         .insert({ ...input, created_by: user.id })
         .select()
         .single();
@@ -47,15 +47,15 @@ export function useCreateGroup() {
       if (groupError) throw groupError;
 
       const { error: memberError } = await supabase
-        .from("group_members")
-        .insert({ group_id: group.id, user_id: user.id, role: "admin" });
+        .from('group_members')
+        .insert({ group_id: group.id, user_id: user.id, role: 'admin' });
 
       if (memberError) throw memberError;
 
       return group;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
   });
 }
@@ -68,22 +68,22 @@ export function useJoinGroup() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error('Not authenticated');
 
       const { data: group, error: groupError } = await supabase
-        .from("groups")
-        .select("*")
-        .eq("invite_code", inviteCode)
+        .from('groups')
+        .select('*')
+        .eq('invite_code', inviteCode)
         .single();
 
-      if (groupError) throw new Error("Invalid invite code");
+      if (groupError) throw new Error('Invalid invite code');
 
       const { error: memberError } = await supabase
-        .from("group_members")
+        .from('group_members')
         .insert({ group_id: group.id, user_id: user.id });
 
       if (memberError) {
-        if (memberError.code === "23505") {
+        if (memberError.code === '23505') {
           throw new Error("You're already a member of this group");
         }
         throw memberError;
@@ -92,19 +92,19 @@ export function useJoinGroup() {
       return group;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
   });
 }
 
 export function useGroupMembers(groupId: string) {
   return useQuery({
-    queryKey: ["group-members", groupId],
+    queryKey: ['group-members', groupId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("group_members")
-        .select("*, profiles(*)")
-        .eq("group_id", groupId);
+        .from('group_members')
+        .select('*, profiles(*)')
+        .eq('group_id', groupId);
 
       if (error) throw error;
       return data;
