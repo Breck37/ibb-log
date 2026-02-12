@@ -1,14 +1,14 @@
-import { GearSix, Plus, UsersThree } from "phosphor-react-native";
-import { Link } from "expo-router";
+import { Link } from 'expo-router';
+import { UsersThree } from 'phosphor-react-native';
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
   Text,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { useMyGroups } from "@/lib/hooks/use-groups";
+import { useMyGroups } from '@/lib/hooks/use-groups';
 
 export default function GroupsScreen() {
   const { data: groups, isLoading, error } = useMyGroups();
@@ -99,7 +99,7 @@ export default function GroupsScreen() {
                     {item.min_workouts_per_week}x/week
                     {item.min_workout_minutes_to_qualify
                       ? ` · ${item.min_workout_minutes_to_qualify} min minimum`
-                      : ""}
+                      : ''}
                   </Text>
                 </View>
               </View>
