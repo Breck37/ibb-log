@@ -4,9 +4,9 @@ Step-by-step plan to get IBB Log distributed via EAS Build and available on Test
 
 ## Prerequisites
 
-- [ ] Active Apple Developer account ($99/year)
-- [ ] EAS CLI installed (`pnpm add -g eas-cli`)
-- [ ] Logged into EAS (`eas login`)
+- [x] Active Apple Developer account ($99/year)
+- [x] EAS CLI installed (`pnpm add -g eas-cli`)
+- [x] Logged into EAS (`eas login`)
 - [ ] Logged into Apple Developer via EAS (`eas credentials`)
 
 ## Current State
