@@ -11,13 +11,19 @@ export function useMyGroups() {
   return useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
-        .from('groups')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from('group_members')
+        .select('group_id, groups(*)')
+        .eq('user_id', user.id)
+        .order('joined_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return (data ?? []).map((row) => row.groups!);
     },
   });
 }
