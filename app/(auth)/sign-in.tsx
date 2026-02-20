@@ -72,6 +72,14 @@ export default function SignInScreen() {
           loading={loading}
         />
 
+        <Link href="/(auth)/forgot-password" asChild>
+          <Pressable>
+            <Text className="mb-4 text-center text-sm text-blue-600">
+              Forgot password?
+            </Text>
+          </Pressable>
+        </Link>
+
         <Link href="/(auth)/sign-up" asChild>
           <Pressable>
             <Text className="text-center text-sm text-blue-600">

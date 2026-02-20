@@ -12,7 +12,17 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "brent.eckert7@gmail.com",
+        "ascAppId": "6759132831",
+        "appleTeamId": "4344ZG274C"
+      }
     }
   }
 }
