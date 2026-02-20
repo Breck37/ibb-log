@@ -21,6 +21,7 @@
     "db:gen-types": "npx supabase gen types typescript --linked > lib/database.types.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "setup:hooks": "sh .hooks/setup.sh",
     "test": "jest"
   },
   "jest": {
