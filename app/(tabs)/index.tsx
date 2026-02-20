@@ -80,7 +80,9 @@ export default function FeedScreen() {
             <Text className="mb-1 text-base font-bold tracking-widest text-forge-text">
               NO WORKOUTS YET
             </Text>
-            <Text className="text-sm text-forge-muted">Log one to get started.</Text>
+            <Text className="text-sm text-forge-muted">
+              Log one to get started.
+            </Text>
           </View>
         }
         ListHeaderComponent={
@@ -95,9 +97,7 @@ export default function FeedScreen() {
                 >
                   FEED
                 </Text>
-                <Text className="text-xs text-forge-muted">
-                  Group activity
-                </Text>
+                <Text className="text-xs text-forge-muted">Group activity</Text>
               </View>
             </View>
 
@@ -107,7 +107,11 @@ export default function FeedScreen() {
                 <Button className="flex-1" title="Create Group" />
               </Link>
               <Link href="/group/join" asChild>
-                <Button className="flex-1" variant="outline" title="Join Group" />
+                <Button
+                  className="flex-1"
+                  variant="outline"
+                  title="Join Group"
+                />
               </Link>
             </View>
           </View>

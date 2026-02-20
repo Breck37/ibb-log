@@ -53,9 +53,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
         ) : null}
         {workout.is_qualified && (
           <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
-            <Text className="text-xs font-medium text-primary">
-              Qualified
-            </Text>
+            <Text className="text-xs font-medium text-primary">Qualified</Text>
           </View>
         )}
       </View>
