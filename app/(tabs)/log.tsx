@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 
 import { Input } from '@/components/ui/Input';
-import { WorkoutCard } from '@/components/workoutCard';
+import { WorkoutCard } from '@/components/WorkoutCard';
 import { useMyGroups } from '@/lib/hooks/use-groups';
 import { useCreateWorkout, useMyWorkouts } from '@/lib/hooks/use-workouts';
 import { pickImages } from '@/lib/services/image-upload';
