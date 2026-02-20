@@ -1,8 +1,24 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, useColorScheme, View } from 'react-native';
 
 import { Forge } from '@/constants/Colors';
 import type { FeedWorkout } from '@/lib/hooks/use-workouts';
+
+const lightShadow = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.07,
+  shadowRadius: 8,
+  elevation: 3,
+};
+
+const darkShadow = {
+  shadowColor: Forge.primary,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.45,
+  shadowRadius: 18,
+  elevation: 6,
+};
 
 type WorkoutCardProps = {
   workout: FeedWorkout;
@@ -12,16 +28,20 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
   const displayName =
     workout.profiles?.display_name ?? workout.profiles?.username ?? 'You';
   const timeAgo = getTimeAgo(workout.created_at);
+  const colorScheme = useColorScheme();
 
   return (
-    <View className="mb-3 rounded-lg border border-forge-border bg-forge-surface p-4">
+    <View
+      className="mb-3 rounded-lg border border-forge-border bg-forge-surface p-4"
+      style={colorScheme === 'dark' ? darkShadow : lightShadow}
+    >
       {/* Header row */}
       <View className="mb-3 flex-row items-center">
         <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-forge-elevated">
           <FontAwesome name="user" size={16} color={Forge.primary} />
         </View>
         <View className="flex-1">
-          <Text className="font-semibold text-white">{displayName}</Text>
+          <Text className="font-semibold text-forge-text">{displayName}</Text>
           <Text className="text-xs text-forge-muted">{timeAgo}</Text>
         </View>
         {workout.groupName ? (
@@ -41,7 +61,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
       </View>
 
       {/* Workout info */}
-      <Text className="mb-1 font-medium text-white">
+      <Text className="mb-1 font-medium text-forge-text">
         {workout.duration_minutes} min &middot; {workout.title}
       </Text>
 
