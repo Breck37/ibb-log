@@ -11,17 +11,17 @@ interface ButtonProps extends Omit<PressableProps, 'children'> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-blue-600 active:bg-blue-700',
-  outline: 'border border-blue-600 active:bg-blue-50',
-  danger: 'border border-red-300 active:bg-red-50',
+  primary: 'bg-primary active:bg-primary-dim',
+  outline: 'border border-primary active:bg-primary/10',
+  danger: 'border border-primary/60 active:bg-primary/10',
   ghost: '',
 };
 
 const variantTextClasses: Record<ButtonVariant, string> = {
   primary: 'text-white',
-  outline: 'text-blue-600',
-  danger: 'text-red-600',
-  ghost: 'text-blue-600',
+  outline: 'text-primary',
+  danger: 'text-primary',
+  ghost: 'text-forge-muted',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -35,7 +35,7 @@ const sizeTextClasses: Record<ButtonSize, string> = {
 };
 
 const baseClasses = 'rounded-lg';
-const baseTextClasses = 'text-center font-semibold';
+const baseTextClasses = 'text-center font-semibold tracking-wide';
 
 export function Button({
   title,
