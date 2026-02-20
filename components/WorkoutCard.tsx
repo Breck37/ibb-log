@@ -1,7 +1,24 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, useColorScheme, View } from 'react-native';
 
+import { Forge } from '@/constants/Colors';
 import type { FeedWorkout } from '@/lib/hooks/use-workouts';
+
+const lightShadow = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.07,
+  shadowRadius: 8,
+  elevation: 3,
+};
+
+const darkShadow = {
+  shadowColor: Forge.primary,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.45,
+  shadowRadius: 18,
+  elevation: 6,
+};
 
 type WorkoutCardProps = {
   workout: FeedWorkout;
@@ -11,39 +28,43 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
   const displayName =
     workout.profiles?.display_name ?? workout.profiles?.username ?? 'You';
   const timeAgo = getTimeAgo(workout.created_at);
+  const colorScheme = useColorScheme();
 
   return (
-    <View className="mb-3 rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
-      <View className="mb-2 flex-row items-center">
-        <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-          <FontAwesome name="user" size={16} color="#3b82f6" />
+    <View
+      className="mb-3 rounded-lg border border-forge-border bg-forge-surface p-4"
+      style={colorScheme === 'dark' ? darkShadow : lightShadow}
+    >
+      {/* Header row */}
+      <View className="mb-3 flex-row items-center">
+        <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-forge-elevated">
+          <FontAwesome name="user" size={16} color={Forge.primary} />
         </View>
         <View className="flex-1">
-          <Text className="font-semibold dark:text-white">{displayName}</Text>
-          <Text className="text-xs text-gray-500">{timeAgo}</Text>
+          <Text className="font-semibold text-forge-text">{displayName}</Text>
+          <Text className="text-xs text-forge-muted">{timeAgo}</Text>
         </View>
         {workout.groupName ? (
-          <View className="mr-2 rounded-full bg-blue-50 px-2.5 py-1 dark:bg-blue-900/30">
-            <Text className="text-xs font-medium text-blue-600 dark:text-blue-400">
+          <View className="mr-2 rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1">
+            <Text className="text-xs font-medium text-forge-secondary-text">
               {workout.groupName}
             </Text>
           </View>
         ) : null}
         {workout.is_qualified && (
-          <View className="rounded-full bg-green-100 px-2 py-1">
-            <Text className="text-xs font-medium text-green-700">
-              Qualified
-            </Text>
+          <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
+            <Text className="text-xs font-medium text-primary">Qualified</Text>
           </View>
         )}
       </View>
 
-      <Text className="mb-1 font-medium dark:text-white">
+      {/* Workout info */}
+      <Text className="mb-1 font-medium text-forge-text">
         {workout.duration_minutes} min &middot; {workout.title}
       </Text>
 
       {workout.description && (
-        <Text className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+        <Text className="mb-2 text-sm text-forge-muted">
           {workout.description}
         </Text>
       )}
