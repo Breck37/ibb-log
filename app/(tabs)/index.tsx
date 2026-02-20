@@ -77,7 +77,7 @@ export default function FeedScreen() {
         contentContainerClassName="px-4"
         ListEmptyComponent={
           <View className="items-center py-24">
-            <Text className="mb-1 text-base font-bold tracking-widest text-white">
+            <Text className="mb-1 text-base font-bold tracking-widest text-forge-text">
               NO WORKOUTS YET
             </Text>
             <Text className="text-sm text-forge-muted">Log one to get started.</Text>
@@ -90,7 +90,7 @@ export default function FeedScreen() {
               <View className="h-6 w-[2px] bg-primary" />
               <View>
                 <Text
-                  className="text-2xl font-bold text-white"
+                  className="text-2xl font-bold text-forge-text"
                   style={{ letterSpacing: 4 }}
                 >
                   FEED
