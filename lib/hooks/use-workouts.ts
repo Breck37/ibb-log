@@ -117,16 +117,22 @@ export function useFeedWorkouts() {
   return useQuery({
     queryKey: ['workouts', 'feed'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Fetch group workouts (visible via RLS to group members)
+      const { data: groupData, error: groupError } = await supabase
         .from('group_workouts')
         .select(
           'is_qualified, groups(name), workouts(*, profiles(username, display_name, avatar_url))',
         )
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (groupError) throw groupError;
 
-      return (data ?? []).map((row) => ({
+      const groupFeed = (groupData ?? []).map((row) => ({
         id: row.workouts!.id,
         duration_minutes: row.workouts!.duration_minutes,
         title: row.workouts!.title,
@@ -136,7 +142,37 @@ export function useFeedWorkouts() {
         is_qualified: row.is_qualified,
         groupName: row.groups?.name ?? '',
         profiles: row.workouts!.profiles,
-      })) satisfies FeedWorkout[];
+      }));
+
+      // Fetch user's own workouts not posted to any group
+      const groupWorkoutIds = new Set(groupFeed.map((w) => w.id));
+
+      const { data: ownData, error: ownError } = await supabase
+        .from('workouts')
+        .select('*, profiles(username, display_name, avatar_url)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (ownError) throw ownError;
+
+      const ungroupedFeed = (ownData ?? [])
+        .filter((w) => !groupWorkoutIds.has(w.id))
+        .map((w) => ({
+          id: w.id,
+          duration_minutes: w.duration_minutes,
+          title: w.title,
+          description: w.description,
+          image_urls: w.image_urls ?? [],
+          created_at: w.created_at,
+          is_qualified: false,
+          groupName: '',
+          profiles: w.profiles,
+        }));
+
+      return [...groupFeed, ...ungroupedFeed].sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      ) satisfies FeedWorkout[];
     },
   });
 }
