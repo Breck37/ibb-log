@@ -1,15 +1,8 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { House, PlusCircle, Trophy, User } from 'phosphor-react-native';
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
 import Colors from '@/constants/Colors';
-
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={24} style={{ marginBottom: -3 }} {...props} />;
-}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -32,7 +25,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Feed',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <House size={24} color={color} weight="regular" />,
         }}
       />
       <Tabs.Screen
@@ -40,7 +33,7 @@ export default function TabLayout() {
         options={{
           title: 'Log',
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="plus-circle" color={color} />
+            <PlusCircle size={24} color={color} weight="regular" />
           ),
         }}
       />
@@ -48,14 +41,14 @@ export default function TabLayout() {
         name="leaderboard"
         options={{
           title: 'Leaderboard',
-          tabBarIcon: ({ color }) => <TabBarIcon name="trophy" color={color} />,
+          tabBarIcon: ({ color }) => <Trophy size={24} color={color} weight="regular" />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          tabBarIcon: ({ color }) => <User size={24} color={color} weight="regular" />,
         }}
       />
     </Tabs>

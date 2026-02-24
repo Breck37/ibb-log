@@ -1,5 +1,5 @@
 import { Button, Input } from '@/components/ui/';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Camera, User } from 'phosphor-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
 import { useState } from 'react';
@@ -156,16 +156,16 @@ export default function ProfileScreen() {
                 style={{ width: 96, height: 96, borderRadius: 48 }}
               />
               <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-blue-600">
-                <FontAwesome name="camera" size={12} color="#fff" />
+                <Camera size={12} color="#fff" weight="regular" />
               </View>
             </View>
           ) : (
             <View>
               <View className="h-24 w-24 items-center justify-center rounded-full bg-blue-100">
-                <FontAwesome name="user" size={36} color="#3b82f6" />
+                <User size={36} color="#3b82f6" weight="regular" />
               </View>
               <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-blue-600">
-                <FontAwesome name="camera" size={12} color="#fff" />
+                <Camera size={12} color="#fff" weight="regular" />
               </View>
             </View>
           )}
