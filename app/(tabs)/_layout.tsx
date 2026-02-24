@@ -25,7 +25,9 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Feed',
-          tabBarIcon: ({ color }) => <House size={24} color={color} weight="regular" />,
+          tabBarIcon: ({ color }) => (
+            <House size={24} color={color} weight="regular" />
+          ),
         }}
       />
       <Tabs.Screen
@@ -41,14 +43,18 @@ export default function TabLayout() {
         name="leaderboard"
         options={{
           title: 'Leaderboard',
-          tabBarIcon: ({ color }) => <Trophy size={24} color={color} weight="regular" />,
+          tabBarIcon: ({ color }) => (
+            <Trophy size={24} color={color} weight="regular" />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <User size={24} color={color} weight="regular" />,
+          tabBarIcon: ({ color }) => (
+            <User size={24} color={color} weight="regular" />
+          ),
         }}
       />
     </Tabs>
