@@ -54,3 +54,35 @@ Serious.
 Focused.
 Disciplined.
 Minimal hype.
+
+## Navigation Patterns
+
+### FloatingActions
+
+`FloatingActions` is the standard for all contextual screen actions (back, dismiss, confirm, etc.).
+
+Rules:
+
+- Never use native header buttons for contextual navigation actions.
+- 1–3 actions max, rendered as a vertical column of circular buttons.
+- Position is user-controlled via the settings store (default: `bottom-right`).
+- The component reads its position from the Zustand settings store — no prop threading needed.
+
+Styling:
+
+- Background: `forge-surface` (`#141821`)
+- Border: subtle `forge-border` ring (`#1E2235`)
+- Size: 56×56px circular buttons, 12px gap between them
+- Glow: neon accent (`#454dcc`) shadow on press only — no constant glow
+- Entrance: slides in from nearest edge + fade, 300ms, cubic-bezier(0.25, 0.8, 0.25, 1)
+
+Usage:
+
+```tsx
+<FloatingActions
+  actions={[
+    { icon: 'arrow-back', onPress: router.back, label: 'Back' },
+    { icon: 'add', onPress: handleCreate, label: 'Create', variant: 'primary' },
+  ]}
+/>
+```
