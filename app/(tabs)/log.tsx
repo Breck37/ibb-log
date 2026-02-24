@@ -25,7 +25,9 @@ export default function LogScreen() {
   const createWorkout = useCreateWorkout();
   const { data: recentWorkouts } = useMyWorkouts(5);
 
-  const [selectedGroupIds, setSelectedGroupIds] = useState<string[] | null>(null);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[] | null>(
+    null,
+  );
   const [duration, setDuration] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
