@@ -7,12 +7,14 @@ import {
   useSettingsStore,
   type FloatingActionPosition,
 } from '@/lib/stores/settings-store';
+import { useBiometric } from '@/providers/biometric-provider';
 import {
   ActivityIndicator,
   Alert,
   FlatList,
   Image,
   Pressable,
+  Switch,
   Text,
   View,
 } from 'react-native';
@@ -34,6 +36,19 @@ export default function ProfileScreen() {
   const setFloatingActionPosition = useSettingsStore(
     (s) => s.setFloatingActionPosition,
   );
+  const { biometricSupported, biometricEnabled, enableBiometric, disableBiometric } =
+    useBiometric();
+
+  const handleBiometricToggle = async (val: boolean) => {
+    if (val) {
+      const success = await enableBiometric();
+      if (!success) {
+        Alert.alert('Authentication failed', 'Could not enable Face ID.');
+      }
+    } else {
+      disableBiometric();
+    }
+  };
 
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -314,6 +329,20 @@ export default function ProfileScreen() {
               </Pressable>
             ))}
           </View>
+
+          {biometricSupported && (
+            <View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
+              <Text className="text-sm font-medium dark:text-white">
+                Face ID / Touch ID
+              </Text>
+              <Switch
+                value={biometricEnabled}
+                onValueChange={handleBiometricToggle}
+                trackColor={{ false: '#3a3a3a', true: '#454dcc' }}
+                thumbColor="#ffffff"
+              />
+            </View>
+          )}
         </View>
       </View>
 
