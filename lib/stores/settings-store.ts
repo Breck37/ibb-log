@@ -17,8 +17,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       floatingActionPosition: 'bottom-right',
-      setFloatingActionPosition: (pos) =>
-        set({ floatingActionPosition: pos }),
+      setFloatingActionPosition: (pos) => set({ floatingActionPosition: pos }),
     }),
     {
       name: 'ibb-settings',

@@ -86,7 +86,11 @@ Use a single `glowProgress` shared value (0–1) to drive both simultaneously:
 
 ```ts
 const glowStyle = useAnimatedStyle(() => ({
-  borderColor: interpolateColor(glowProgress.value, [0, 1], ['#1E2235', '#454dcc']),
+  borderColor: interpolateColor(
+    glowProgress.value,
+    [0, 1],
+    ['#1E2235', '#454dcc'],
+  ),
   shadowColor: '#454dcc',
   shadowOffset: { width: 0, height: 0 },
   shadowOpacity: glowProgress.value * 0.9,
@@ -97,8 +101,8 @@ const glowStyle = useAnimatedStyle(() => ({
 Trigger:
 
 ```ts
-onPressIn: glowProgress.value = withTiming(1, { duration: 150 })
-onPressOut: glowProgress.value = withTiming(0, { duration: 200 })
+onPressIn: glowProgress.value = withTiming(1, { duration: 150 });
+onPressOut: glowProgress.value = withTiming(0, { duration: 200 });
 ```
 
 ### What it applies to
