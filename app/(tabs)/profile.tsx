@@ -3,6 +3,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
 import { useState } from 'react';
+import { useSettingsStore, type FloatingActionPosition } from '@/lib/stores/settings-store';
 import {
   ActivityIndicator,
   Alert,
@@ -24,6 +25,12 @@ import { useAuth } from '@/providers/auth-provider';
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
+  const floatingActionPosition = useSettingsStore(
+    (s) => s.floatingActionPosition,
+  );
+  const setFloatingActionPosition = useSettingsStore(
+    (s) => s.setFloatingActionPosition,
+  );
 
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -265,6 +272,47 @@ export default function ProfileScreen() {
           ))}
         </View>
       )}
+
+      <View className="mb-6">
+        <Text className="mb-2 text-sm font-semibold text-gray-500">
+          Preferences
+        </Text>
+        <View className="rounded-lg bg-white p-3 shadow-sm dark:bg-gray-800">
+          <Text className="mb-3 text-sm font-medium dark:text-white">
+            Floating Button Position
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {(
+              [
+                'top-left',
+                'top-right',
+                'bottom-left',
+                'bottom-right',
+              ] as FloatingActionPosition[]
+            ).map((pos) => (
+              <Pressable
+                key={pos}
+                className={`flex-1 rounded-lg border py-2 ${
+                  floatingActionPosition === pos
+                    ? 'border-primary bg-primary/10'
+                    : 'border-gray-200 dark:border-gray-600'
+                }`}
+                onPress={() => setFloatingActionPosition(pos)}
+              >
+                <Text
+                  className={`text-center text-xs font-medium capitalize ${
+                    floatingActionPosition === pos
+                      ? 'text-primary'
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}
+                >
+                  {pos.replace('-', '\n')}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      </View>
 
       <Pressable
         className="mb-6 rounded-lg border border-red-300 py-3 active:bg-red-50"
