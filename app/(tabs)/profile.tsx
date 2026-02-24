@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import { WorkoutCard } from '@/components/workoutCard';
+import { WorkoutCard } from '@/components/WorkoutCard';
 import { useMyGroups } from '@/lib/hooks/use-groups';
 import { useUserStats } from '@/lib/hooks/use-stats';
 import { useMyWorkouts } from '@/lib/hooks/use-workouts';

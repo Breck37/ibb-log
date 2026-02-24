@@ -1,0 +1,15 @@
+#!/bin/sh
+# Auto-format staged files with Prettier before each commit.
+# Only touches files already in the staging area — never pulls in unstaged changes.
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx|json|md)$' || true)
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+echo "Formatting staged files..."
+printf '%s\n' $STAGED | xargs pnpm exec prettier --write --ignore-unknown
+printf '%s\n' $STAGED | xargs git add
+
+echo "Done."

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 
 import { Input } from '@/components/ui/Input';
-import { WorkoutCard } from '@/components/workoutCard';
+import { WorkoutCard } from '@/components/WorkoutCard';
 import { useMyGroups } from '@/lib/hooks/use-groups';
 import { useCreateWorkout, useMyWorkouts } from '@/lib/hooks/use-workouts';
 import { pickImages } from '@/lib/services/image-upload';
@@ -25,22 +25,23 @@ export default function LogScreen() {
   const createWorkout = useCreateWorkout();
   const { data: recentWorkouts } = useMyWorkouts(5);
 
-  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[] | null>(
+    null,
+  );
   const [duration, setDuration] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState<ImagePickerAsset[]>([]);
 
-  // Auto-select all groups when they load and none are selected yet
+  // Auto-select all groups until the user interacts with the selector
   const effectiveGroupIds =
-    selectedGroupIds.length > 0
+    selectedGroupIds !== null
       ? selectedGroupIds
       : (groups?.map((g) => g.id) ?? []);
 
   const toggleGroup = (groupId: string) => {
     setSelectedGroupIds((prev) => {
-      // Initialize from all groups if first interaction
-      const current = prev.length > 0 ? prev : (groups?.map((g) => g.id) ?? []);
+      const current = prev !== null ? prev : (groups?.map((g) => g.id) ?? []);
       return current.includes(groupId)
         ? current.filter((id) => id !== groupId)
         : [...current, groupId];
@@ -86,7 +87,7 @@ export default function LogScreen() {
       setTitle('');
       setDescription('');
       setImages([]);
-      setSelectedGroupIds([]);
+      setSelectedGroupIds(null);
       router.navigate('/(tabs)');
     } catch (error) {
       Alert.alert(
@@ -96,7 +97,7 @@ export default function LogScreen() {
     }
   };
 
-  const showGroupSelector = groups && groups.length > 1;
+  const showGroupSelector = groups && groups.length > 0;
 
   return (
     <KeyboardAvoidingView
