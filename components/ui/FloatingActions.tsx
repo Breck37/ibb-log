@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -69,20 +70,28 @@ export function FloatingActions({ actions }: FloatingActionsProps) {
 
 function ActionButton({ action }: { action: FloatingAction }) {
   const isPrimary = action.variant === 'primary';
-  const shadowOpacity = useSharedValue(0);
+  const glowProgress = useSharedValue(0);
 
+  // Single progress value drives both border color and shadow intensity —
+  // the border lights up and the outer halo spreads simultaneously.
   const glowStyle = useAnimatedStyle(() => ({
-    shadowOpacity: shadowOpacity.value,
+    borderColor: interpolateColor(
+      glowProgress.value,
+      [0, 1],
+      [isPrimary ? '#454dcc' : '#1E2235', '#454dcc'],
+    ),
+    shadowOpacity: glowProgress.value * 0.9,
+    shadowRadius: 8 + glowProgress.value * 8,
   }));
 
   return (
     <Pressable
       onPress={action.onPress}
       onPressIn={() => {
-        shadowOpacity.value = withTiming(0.8, { duration: 150 });
+        glowProgress.value = withTiming(1, { duration: 150 });
       }}
       onPressOut={() => {
-        shadowOpacity.value = withTiming(0, { duration: 200 });
+        glowProgress.value = withTiming(0, { duration: 200 });
       }}
       accessibilityLabel={action.label}
       accessibilityRole="button"
