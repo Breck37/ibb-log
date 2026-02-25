@@ -8,6 +8,7 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
+import { Alert, Linking, Platform } from 'react-native';
 
 import { useSettingsStore } from '@/lib/stores/settings-store';
 
@@ -65,6 +66,27 @@ export function BiometricProvider({ children }: PropsWithChildren) {
       disableDeviceFallback: false,
       cancelLabel: 'Cancel',
     });
+
+    if (!result.success && result.error === 'not_available') {
+      // Face ID / biometric permission was denied in system settings
+      Alert.alert(
+        'Permission Required',
+        Platform.OS === 'ios'
+          ? 'Face ID access is disabled for IBB Log. Enable it in Settings → IBB Log → Face ID.'
+          : 'Biometric access is disabled. Enable it in your device Settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Open Settings',
+            onPress: () =>
+              Platform.OS === 'ios'
+                ? Linking.openURL('app-settings:')
+                : Linking.openSettings(),
+          },
+        ],
+      );
+    }
+
     return result.success;
   }, []);
 
