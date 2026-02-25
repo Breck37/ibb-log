@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Image, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, useColorScheme, View } from 'react-native';
 
 import { Forge } from '@/constants/Colors';
 import type { FeedWorkout } from '@/lib/hooks/use-workouts';
@@ -22,9 +22,11 @@ const darkShadow = {
 
 type WorkoutCardProps = {
   workout: FeedWorkout;
+  /** Called when the user taps the edit button. Only provide this for workouts the current user owns. */
+  onEdit?: () => void;
 };
 
-export function WorkoutCard({ workout }: WorkoutCardProps) {
+export function WorkoutCard({ workout, onEdit }: WorkoutCardProps) {
   const displayName =
     workout.profiles?.display_name ?? workout.profiles?.username ?? 'You';
   const timeAgo = getTimeAgo(workout.created_at);
@@ -55,6 +57,15 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
           <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
             <Text className="text-xs font-medium text-primary">Qualified</Text>
           </View>
+        )}
+        {onEdit && (
+          <Pressable
+            onPress={onEdit}
+            hitSlop={8}
+            className="ml-2 h-7 w-7 items-center justify-center rounded-full bg-forge-elevated active:bg-forge-border"
+          >
+            <FontAwesome name="pencil" size={11} color={Forge.primary} />
+          </Pressable>
         )}
       </View>
 
