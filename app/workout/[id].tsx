@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 
+import { EditWorkoutModal, type EditableWorkout } from '@/components/EditWorkoutModal';
 import { supabase } from '@/lib/supabase';
 import {
   useAddComment,
@@ -19,12 +20,15 @@ import {
   useReactions,
   useToggleReaction,
 } from '@/lib/hooks/use-social';
+import { useAuth } from '@/providers/auth-provider';
 
 const REACTION_EMOJIS = ['💪', '🔥', '👏', '🎯', '⭐'];
 
 export default function WorkoutDetailScreen() {
   const { id: groupWorkoutId } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
   const [commentText, setCommentText] = useState('');
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(null);
 
   const { data: groupWorkout, isLoading } = useQuery({
     queryKey: ['group-workout', groupWorkoutId],
@@ -82,9 +86,35 @@ export default function WorkoutDetailScreen() {
   const displayName =
     workout.profiles?.display_name ?? workout.profiles?.username ?? 'Unknown';
 
+  const isOwner = workout.user_id === user?.id;
+
+  const editableWorkout: EditableWorkout = {
+    id: workout.id,
+    title: workout.title,
+    description: workout.description,
+    duration_minutes: workout.duration_minutes,
+    image_urls: workout.image_urls,
+    created_at: workout.created_at,
+  };
+
   return (
     <>
-      <Stack.Screen options={{ title: `${displayName}'s Workout` }} />
+      <Stack.Screen
+        options={{
+          title: `${displayName}'s Workout`,
+          headerRight: isOwner
+            ? () => (
+                <Pressable
+                  onPress={() => setEditingWorkout(editableWorkout)}
+                  hitSlop={8}
+                  className="px-2"
+                >
+                  <FontAwesome name="pencil" size={16} color="#3b82f6" />
+                </Pressable>
+              )
+            : undefined,
+        }}
+      />
       <ScrollView className="flex-1" contentContainerClassName="p-4 pb-10">
         <View className="mb-4 rounded-lg bg-white p-4 dark:bg-gray-800">
           <View className="mb-3 flex-row items-center">
@@ -210,6 +240,12 @@ export default function WorkoutDetailScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <EditWorkoutModal
+        workout={editingWorkout}
+        visible={!!editingWorkout}
+        onClose={() => setEditingWorkout(null)}
+      />
     </>
   );
 }

@@ -3,6 +3,9 @@ import { Camera, User } from 'phosphor-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
 import { useState } from 'react';
+
+import { EditWorkoutModal, type EditableWorkout } from '@/components/EditWorkoutModal';
+import type { FeedWorkout } from '@/lib/hooks/use-workouts';
 import {
   useSettingsStore,
   type FloatingActionPosition,
@@ -62,6 +65,7 @@ export default function ProfileScreen() {
   const [username, setUsername] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -396,7 +400,15 @@ export default function ProfileScreen() {
           <Text className="text-forge-muted">No workouts yet</Text>
         </View>
       }
-      renderItem={({ item }) => <WorkoutCard workout={item} />}
+      renderItem={({ item }: { item: FeedWorkout }) => (
+        <WorkoutCard workout={item} onEdit={() => setEditingWorkout(item)} />
+      )}
+    />
+
+    <EditWorkoutModal
+      workout={editingWorkout}
+      visible={!!editingWorkout}
+      onClose={() => setEditingWorkout(null)}
     />
   );
 }

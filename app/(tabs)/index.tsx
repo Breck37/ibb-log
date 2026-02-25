@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -12,8 +12,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Forge } from '@/constants/Colors';
 import { Button } from '@/components/ui/Button';
+import { EditWorkoutModal, type EditableWorkout } from '@/components/EditWorkoutModal';
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useFeedWorkouts } from '@/lib/hooks/use-workouts';
+import { useAuth } from '@/providers/auth-provider';
 
 function AnimatedCard({
   children,
@@ -48,7 +50,9 @@ function AnimatedCard({
 
 export default function FeedScreen() {
   const { data: workouts, isLoading, error } = useFeedWorkouts();
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(null);
 
   if (isLoading) {
     return (
@@ -118,9 +122,22 @@ export default function FeedScreen() {
         }
         renderItem={({ item, index }) => (
           <AnimatedCard index={index}>
-            <WorkoutCard workout={item} />
+            <WorkoutCard
+              workout={item}
+              onEdit={
+                item.user_id === user?.id
+                  ? () => setEditingWorkout(item)
+                  : undefined
+              }
+            />
           </AnimatedCard>
         )}
+      />
+
+      <EditWorkoutModal
+        workout={editingWorkout}
+        visible={!!editingWorkout}
+        onClose={() => setEditingWorkout(null)}
       />
     </View>
   );

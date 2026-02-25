@@ -6,6 +6,78 @@ import { uploadMultipleImages } from '@/lib/services/image-upload';
 
 import type { ImagePickerAsset } from 'expo-image-picker';
 
+type UpdateWorkoutInput = {
+  workoutId: string;
+  title: string;
+  description: string | null;
+  durationMinutes: number;
+  keptImageUrls: string[];
+  newImages: ImagePickerAsset[];
+};
+
+export function useUpdateWorkout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdateWorkoutInput) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Upload any new images first
+      let newUrls: string[] = [];
+      if (input.newImages.length > 0) {
+        newUrls = await uploadMultipleImages(user.id, input.newImages);
+      }
+      const finalImageUrls = [...input.keptImageUrls, ...newUrls];
+
+      // Update the workout (RLS ensures only owner can update)
+      const { error: workoutError } = await supabase
+        .from('workouts')
+        .update({
+          title: input.title,
+          description: input.description,
+          duration_minutes: input.durationMinutes,
+          image_urls: finalImageUrls,
+        })
+        .eq('id', input.workoutId)
+        .eq('user_id', user.id);
+
+      if (workoutError) throw workoutError;
+
+      // Re-evaluate is_qualified for all associated group_workouts if duration changed
+      const { data: groupWorkouts } = await supabase
+        .from('group_workouts')
+        .select('id, groups(min_workout_minutes_to_qualify)')
+        .eq('workout_id', input.workoutId);
+
+      if (groupWorkouts && groupWorkouts.length > 0) {
+        await Promise.all(
+          groupWorkouts.map((gw) =>
+            supabase
+              .from('group_workouts')
+              .update({
+                is_qualified:
+                  input.durationMinutes >=
+                  (gw.groups?.min_workout_minutes_to_qualify ?? 0),
+              })
+              .eq('id', gw.id),
+          ),
+        );
+      }
+
+      return { imageUrls: finalImageUrls };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workout'] });
+      queryClient.invalidateQueries({ queryKey: ['compliance'] });
+    },
+  });
+}
+
 type WorkoutInput = {
   groupIds: string[];
   durationMinutes: number;
@@ -99,6 +171,7 @@ export function useGroupWorkouts(groupId: string) {
 
 export type FeedWorkout = {
   id: string;
+  user_id: string;
   duration_minutes: number;
   title: string;
   description: string | null;
@@ -134,6 +207,7 @@ export function useFeedWorkouts() {
 
       const groupFeed = (groupData ?? []).map((row) => ({
         id: row.workouts!.id,
+        user_id: row.workouts!.user_id,
         duration_minutes: row.workouts!.duration_minutes,
         title: row.workouts!.title,
         description: row.workouts!.description,
@@ -159,6 +233,7 @@ export function useFeedWorkouts() {
         .filter((w) => !groupWorkoutIds.has(w.id))
         .map((w) => ({
           id: w.id,
+          user_id: w.user_id,
           duration_minutes: w.duration_minutes,
           title: w.title,
           description: w.description,
@@ -203,6 +278,7 @@ export function useMyWorkouts(limit?: number) {
         const firstGw = row.group_workouts?.[0];
         return {
           id: row.id,
+          user_id: row.user_id,
           duration_minutes: row.duration_minutes,
           title: row.title,
           description: row.description,

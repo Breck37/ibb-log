@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { EditWorkoutModal, type EditableWorkout } from '@/components/EditWorkoutModal';
 import { Input } from '@/components/ui/Input';
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useMyGroups } from '@/lib/hooks/use-groups';
@@ -35,6 +36,7 @@ export default function LogScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState<ImagePickerAsset[]>([]);
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(null);
 
   // Auto-select all groups until the user interacts with the selector
   const effectiveGroupIds =
@@ -238,11 +240,21 @@ export default function LogScreen() {
               Recent Workouts
             </Text>
             {recentWorkouts.map((workout) => (
-              <WorkoutCard key={workout.id} workout={workout} />
+              <WorkoutCard
+                key={workout.id}
+                workout={workout}
+                onEdit={() => setEditingWorkout(workout)}
+              />
             ))}
           </View>
         )}
       </ScrollView>
+
+      <EditWorkoutModal
+        workout={editingWorkout}
+        visible={!!editingWorkout}
+        onClose={() => setEditingWorkout(null)}
+      />
     </KeyboardAvoidingView>
   );
 }
