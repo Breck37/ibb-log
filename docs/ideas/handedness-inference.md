@@ -64,7 +64,7 @@ When inference crosses a threshold **and** the current `floatingActionPosition` 
 opposite side, surface a single non-blocking prompt — a bottom sheet or inline banner, not
 a modal alert:
 
-> *"Looks like you might be left-handed. Move the action buttons to the left?"*
+> _"Looks like you might be left-handed. Move the action buttons to the left?"_
 > **Move them** · **Keep right**
 
 Either choice records the preference and permanently suppresses the prompt. No re-asking.

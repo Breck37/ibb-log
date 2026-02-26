@@ -3,7 +3,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { useSettingsStore, type FloatingActionPosition } from '@/lib/stores/settings-store';
+import {
+  useSettingsStore,
+  type FloatingActionPosition,
+} from '@/lib/stores/settings-store';
 import {
   ActivityIndicator,
   Alert,
