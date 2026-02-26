@@ -97,7 +97,9 @@ export function BiometricProvider({ children }: PropsWithChildren) {
   }, [authenticate]);
 
   const enableBiometric = useCallback(async () => {
-    const success = await authenticate('Confirm your identity to enable Face ID');
+    const success = await authenticate(
+      'Confirm your identity to enable Face ID',
+    );
     if (success) setBiometricEnabled(true);
     return success;
   }, [authenticate, setBiometricEnabled]);

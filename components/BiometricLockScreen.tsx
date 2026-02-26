@@ -25,11 +25,7 @@ export function BiometricLockScreen() {
   useEffect(() => {
     // Determine auth type for icon
     LocalAuthentication.supportedAuthenticationTypesAsync().then((types) => {
-      if (
-        types.includes(
-          LocalAuthentication.AuthenticationType.FINGERPRINT,
-        )
-      ) {
+      if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
         setAuthType('fingerprint');
       }
     });

@@ -15,7 +15,10 @@ import '../global.css';
 import { BiometricLockScreen } from '@/components/BiometricLockScreen';
 import { darkTheme, lightTheme } from '@/constants/Colors';
 import { AuthProvider } from '@/providers/auth-provider';
-import { BiometricProvider, useBiometric } from '@/providers/biometric-provider';
+import {
+  BiometricProvider,
+  useBiometric,
+} from '@/providers/biometric-provider';
 
 export { ErrorBoundary } from 'expo-router';
 

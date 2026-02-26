@@ -36,8 +36,12 @@ export default function ProfileScreen() {
   const setFloatingActionPosition = useSettingsStore(
     (s) => s.setFloatingActionPosition,
   );
-  const { biometricSupported, biometricEnabled, enableBiometric, disableBiometric } =
-    useBiometric();
+  const {
+    biometricSupported,
+    biometricEnabled,
+    enableBiometric,
+    disableBiometric,
+  } = useBiometric();
 
   const handleBiometricToggle = async (val: boolean) => {
     if (val) {
