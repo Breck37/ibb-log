@@ -40,7 +40,10 @@ export default function GroupDetailScreen() {
         message: `Join my group "${group.name}" on IBB Log!\nUse invite code: ${group.invite_code}`,
       });
     } catch (error) {
-      if (error instanceof Error && error.message !== 'The user did not share') {
+      if (
+        error instanceof Error &&
+        error.message !== 'The user did not share'
+      ) {
         Alert.alert('Error', 'Could not open share sheet.');
       }
     }
