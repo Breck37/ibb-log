@@ -1,4 +1,4 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { User } from 'phosphor-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -191,7 +191,7 @@ function LeaderboardRow({
         )}
       </View>
       <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-        <FontAwesome name="user" size={16} color="#3b82f6" />
+        <User size={16} color="#3b82f6" weight="regular" />
       </View>
       <View className="flex-1">
         <Text className="font-semibold dark:text-white">
@@ -229,7 +229,7 @@ function ComplianceRow({
         className={`mr-3 h-3 w-3 rounded-full ${entry.isCompliant ? 'bg-green-500' : 'bg-red-400'}`}
       />
       <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-        <FontAwesome name="user" size={16} color="#3b82f6" />
+        <User size={16} color="#3b82f6" weight="regular" />
       </View>
       <View className="flex-1">
         <Text className="font-semibold dark:text-white">
