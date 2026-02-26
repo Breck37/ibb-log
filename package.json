@@ -22,6 +22,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "setup:hooks": "sh .hooks/setup.sh",
+    "prepare": "sh .hooks/setup.sh",
     "test": "jest"
   },
   "jest": {
