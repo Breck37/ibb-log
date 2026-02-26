@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
+  Share,
   Text,
   View,
 } from 'react-native';
@@ -30,6 +32,22 @@ export default function GroupDetailScreen() {
   });
 
   const { data: members } = useGroupMembers(id);
+
+  const handleShareInvite = async () => {
+    if (!group) return;
+    try {
+      await Share.share({
+        message: `Join my group "${group.name}" on IBB Log!\nUse invite code: ${group.invite_code}`,
+      });
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message !== 'The user did not share'
+      ) {
+        Alert.alert('Error', 'Could not open share sheet.');
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -66,9 +84,18 @@ export default function GroupDetailScreen() {
           <Text className="text-lg font-bold dark:text-white">
             {group.name}
           </Text>
-          <Text className="mt-2 text-sm text-gray-500">
-            Invite code: {group.invite_code}
-          </Text>
+          <Pressable
+            onPress={handleShareInvite}
+            className="mt-2 flex-row items-center gap-2 self-start"
+          >
+            <Text className="text-sm text-gray-500">
+              Invite code:{' '}
+              <Text className="font-semibold text-gray-700 dark:text-gray-300">
+                {group.invite_code}
+              </Text>
+            </Text>
+            <FontAwesome name="share" size={13} color="#9ca3af" />
+          </Pressable>
           <Text className="mt-1 text-sm text-gray-500">
             {group.min_workouts_per_week} workouts/week &middot;{' '}
             {group.min_workout_minutes_to_qualify}min minimum
