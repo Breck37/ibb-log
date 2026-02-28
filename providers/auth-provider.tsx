@@ -1,7 +1,9 @@
 import type { Session, User } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
 import { useRouter, useSegments } from 'expo-router';
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -85,6 +87,40 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // When the app is opened via a deep link (e.g. ibblog://reset-password#access_token=...),
+  // the OS hands us the full URL. We extract the tokens from the hash fragment and give
+  // them to Supabase, which then fires the PASSWORD_RECOVERY event above.
+  const handleDeepLink = useCallback(async (url: string) => {
+    const fragment = url.split('#')[1];
+    if (!fragment) return;
+
+    const params = new URLSearchParams(fragment);
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+    const type = params.get('type');
+
+    if (accessToken && refreshToken && type === 'recovery') {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // Case 1: app was closed — the link that opened it is the "initial URL"
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink(url);
+    });
+
+    // Case 2: app was backgrounded — the link arrives as a live event
+    const subscription = Linking.addEventListener('url', ({ url }) =>
+      handleDeepLink(url),
+    );
+
+    return () => subscription.remove();
+  }, [handleDeepLink]);
+
   useProtectedRoute(session?.user ?? null, isLoading, isPasswordRecovery);
 
   const signIn = async (email: string, password: string) => {
@@ -110,7 +146,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'ibblog://reset-password',
+    });
     if (error) throw error;
   };
 
