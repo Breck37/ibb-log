@@ -21,6 +21,7 @@
         "NSPhotoLibraryUsageDescription": "IBB Log needs photo library access to attach workout images.",
         "NSMicrophoneUsageDescription": "IBB Log needs microphone access for voice-to-text comments.",
         "NSSpeechRecognitionUsageDescription": "IBB Log uses speech recognition for voice-to-text comments.",
+        "NSFaceIDUsageDescription": "Use Face ID to quickly unlock IBB Log.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -32,7 +33,13 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.bdotdev.ibblog",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "RECORD_AUDIO"]
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "RECORD_AUDIO",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
     },
     "web": {
       "bundler": "metro",
