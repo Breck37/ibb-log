@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import { BarbellLogo } from '@/components/BarbellLogo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/providers/auth-provider';
@@ -41,12 +42,15 @@ export default function SignInScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      className="flex-1 bg-forge-bg"
     >
       <View className="flex-1 justify-center px-8">
-        <Text className="mb-8 text-center text-3xl font-bold">IBB Log</Text>
+        <View className="mb-10 items-center">
+          <BarbellLogo animate={false} />
+        </View>
 
         <Input
+          glow
           className="mb-4"
           placeholder="Email"
           value={email}
@@ -57,6 +61,7 @@ export default function SignInScreen() {
         />
 
         <Input
+          glow
           className="mb-6"
           placeholder="Password"
           value={password}
@@ -74,7 +79,7 @@ export default function SignInScreen() {
 
         <Link href="/(auth)/forgot-password" asChild>
           <Pressable>
-            <Text className="mb-4 text-center text-sm text-blue-600">
+            <Text className="mb-4 text-center text-sm text-primary">
               Forgot password?
             </Text>
           </Pressable>
@@ -82,8 +87,9 @@ export default function SignInScreen() {
 
         <Link href="/(auth)/sign-up" asChild>
           <Pressable>
-            <Text className="text-center text-sm text-blue-600">
-              Don't have an account? Sign up
+            <Text className="text-center text-sm text-forge-muted">
+              Don't have an account?{' '}
+              <Text className="text-primary">Sign up</Text>
             </Text>
           </Pressable>
         </Link>
