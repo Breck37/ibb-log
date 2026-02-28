@@ -1,4 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+import type { Icon } from 'phosphor-react-native';
 import { useEffect } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, {
@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettingsStore } from '@/lib/stores/settings-store';
 
 export type FloatingAction = {
-  icon: string;
+  Icon: Icon;
   onPress: () => void;
   label?: string;
   variant?: 'default' | 'primary';
@@ -99,10 +99,10 @@ function ActionButton({ action }: { action: FloatingAction }) {
       <Animated.View
         style={[styles.button, isPrimary && styles.buttonPrimary, glowStyle]}
       >
-        <Ionicons
-          name={action.icon as React.ComponentProps<typeof Ionicons>['name']}
+        <action.Icon
           size={22}
           color={isPrimary ? '#ffffff' : '#A1A1AA'}
+          weight="regular"
         />
       </Animated.View>
     </Pressable>

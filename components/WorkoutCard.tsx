@@ -1,4 +1,4 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { User } from 'phosphor-react-native';
 import { Image, ScrollView, Text, useColorScheme, View } from 'react-native';
 
 import { Forge } from '@/constants/Colors';
@@ -38,7 +38,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
       {/* Header row */}
       <View className="mb-3 flex-row items-center">
         <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-forge-elevated">
-          <FontAwesome name="user" size={16} color={Forge.primary} />
+          <User size={16} color={Forge.primary} weight="regular" />
         </View>
         <View className="flex-1">
           <Text className="font-semibold text-forge-text">{displayName}</Text>
