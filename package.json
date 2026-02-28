@@ -29,7 +29,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-async-storage/async-storage": "^3.0.1",
     "@react-navigation/native": "^7.1.8",
     "@supabase/supabase-js": "^2.95.3",
     "@tanstack/react-query": "^5.90.21",
