@@ -224,7 +224,12 @@ const styles = StyleSheet.create({
     right: 0,
     top: (ROW_H - SHAFT_H) / 2,
     height: SHAFT_H,
-    backgroundColor: '#A1A1AA',
+    backgroundColor: '#454dcc',
+    // Glow — the shaft is the light source
+    shadowColor: '#454dcc',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
   },
   platesGroup: {
     position: 'absolute',
@@ -241,7 +246,8 @@ const styles = StyleSheet.create({
     right: OVERHANG,
   },
   plate: {
-    backgroundColor: '#E4E4E7',
+    // Cool chrome steel — blue-shifted from warm gray to feel lit by the neon shaft
+    backgroundColor: '#9898B4',
     borderRadius: 2,
   },
   outerPlate: {
@@ -251,11 +257,16 @@ const styles = StyleSheet.create({
   innerPlate: {
     width: INNER_PLATE_W,
     height: 40,
+    // Slightly darker — recessed behind the outer plate
+    backgroundColor: '#7878A0',
   },
   logoText: {
     fontSize: 13,
     fontWeight: '600',
     letterSpacing: 6,
-    color: '#A1A1AA',
+    color: '#454dcc',
+    textShadowColor: '#454dcc',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
 });
