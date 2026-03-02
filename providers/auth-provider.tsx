@@ -54,7 +54,7 @@ function useProtectedRoute(
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!user && !inAuthGroup) {
-      router.replace('/(auth)/sign-in');
+      router.replace('/(auth)/landing');
     } else if (user && inAuthGroup) {
       router.replace('/(tabs)');
     }

@@ -11,6 +11,8 @@ export type FloatingActionPosition =
 type SettingsState = {
   floatingActionPosition: FloatingActionPosition;
   setFloatingActionPosition: (pos: FloatingActionPosition) => void;
+  biometricEnabled: boolean;
+  setBiometricEnabled: (val: boolean) => void;
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -18,6 +20,8 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       floatingActionPosition: 'bottom-right',
       setFloatingActionPosition: (pos) => set({ floatingActionPosition: pos }),
+      biometricEnabled: false,
+      setBiometricEnabled: (val) => set({ biometricEnabled: val }),
     }),
     {
       name: 'ibb-settings',
