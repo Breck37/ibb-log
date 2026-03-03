@@ -13,10 +13,20 @@ const zlib = require('zlib');
 const WIDTH = 1024;
 const HEIGHT = 1024;
 
-// Colors
+// Colors — matches BarbellLogo.tsx neon treatment
 const BG = [0x0b, 0x0d, 0x12]; // #0B0D12
-const PLATE = [0xe4, 0xe4, 0xe7]; // #E4E4E7
-const SHAFT = [0xa1, 0xa1, 0xaa]; // #A1A1AA
+const SHAFT_CORE = [0x45, 0x4d, 0xcc]; // #454dcc — primary accent
+const PLATE_OUTER = [0x98, 0x98, 0xb4]; // #9898B4 — cool chrome
+const PLATE_INNER = [0x78, 0x78, 0xa0]; // #7878A0 — recessed
+
+// Simulated shaft glow — concentric layers blending #454dcc into the bg.
+// Painted back-to-front so the core sits on top.
+function blend(fg, alpha) {
+  return fg.map((c, i) => Math.round(c * alpha + BG[i] * (1 - alpha)));
+}
+const SHAFT_GLOW_3 = blend(SHAFT_CORE, 0.18); // outermost halo
+const SHAFT_GLOW_2 = blend(SHAFT_CORE, 0.38);
+const SHAFT_GLOW_1 = blend(SHAFT_CORE, 0.65); // innermost halo
 
 // Barbell geometry — scaled to ~600px wide, centred on 1024×1024.
 // Mirrors the proportions of BarbellLogo.tsx.
@@ -62,11 +72,20 @@ function fillRect(x, y, w, h, color) {
 }
 
 // Draw barbell
-fillRect(LEFT_OUTER_X, Y_PLATE, OUTER_W, OUTER_H, PLATE);
-fillRect(LEFT_INNER_X, Y_INNER, INNER_W, INNER_H, PLATE);
-fillRect(SHAFT_X, Y_SHAFT, SHAFT_W, SHAFT_H, SHAFT);
-fillRect(RIGHT_INNER_X, Y_INNER, INNER_W, INNER_H, PLATE);
-fillRect(RIGHT_OUTER_X, Y_PLATE, OUTER_W, OUTER_H, PLATE);
+// Plates
+fillRect(LEFT_OUTER_X, Y_PLATE, OUTER_W, OUTER_H, PLATE_OUTER);
+fillRect(LEFT_INNER_X, Y_INNER, INNER_W, INNER_H, PLATE_INNER);
+fillRect(RIGHT_INNER_X, Y_INNER, INNER_W, INNER_H, PLATE_INNER);
+fillRect(RIGHT_OUTER_X, Y_PLATE, OUTER_W, OUTER_H, PLATE_OUTER);
+
+// Shaft glow — outermost to innermost, core last
+const G3 = 10,
+  G2 = 6,
+  G1 = 3; // px of glow spread on each side
+fillRect(SHAFT_X, Y_SHAFT - G3, SHAFT_W, SHAFT_H + G3 * 2, SHAFT_GLOW_3);
+fillRect(SHAFT_X, Y_SHAFT - G2, SHAFT_W, SHAFT_H + G2 * 2, SHAFT_GLOW_2);
+fillRect(SHAFT_X, Y_SHAFT - G1, SHAFT_W, SHAFT_H + G1 * 2, SHAFT_GLOW_1);
+fillRect(SHAFT_X, Y_SHAFT, SHAFT_W, SHAFT_H, SHAFT_CORE);
 
 // ── PNG encoder ─────────────────────────────────────────────────────────────
 
