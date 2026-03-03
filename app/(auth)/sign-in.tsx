@@ -88,7 +88,7 @@ export default function SignInScreen() {
         <Link href="/(auth)/sign-up" asChild>
           <Pressable>
             <Text className="text-center text-sm text-forge-muted">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Text className="text-primary">Sign up</Text>
             </Text>
           </Pressable>
