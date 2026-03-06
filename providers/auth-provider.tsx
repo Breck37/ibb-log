@@ -42,6 +42,8 @@ function useProtectedRoute(
   user: User | null,
   isLoading: boolean,
   isPasswordRecovery: boolean,
+  pendingInviteCode: string | null,
+  clearPendingInvite: () => void,
 ) {
   const segments = useSegments();
   const router = useRouter();
@@ -56,15 +58,26 @@ function useProtectedRoute(
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/sign-in');
     } else if (user && inAuthGroup) {
-      router.replace('/(tabs)');
+      if (pendingInviteCode) {
+        router.replace({
+          pathname: '/group/join',
+          params: { code: pendingInviteCode },
+        });
+        clearPendingInvite();
+      } else {
+        router.replace('/(tabs)');
+      }
     }
-  }, [user, segments, isLoading, isPasswordRecovery]);
+  }, [user, segments, isLoading, isPasswordRecovery, pendingInviteCode]);
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -87,10 +100,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // When the app is opened via a deep link (e.g. ibblog://reset-password#access_token=...),
-  // the OS hands us the full URL. We extract the tokens from the hash fragment and give
-  // them to Supabase, which then fires the PASSWORD_RECOVERY event above.
+  // When the app is opened via a deep link, the OS hands us the full URL.
+  // - Invite links (ibblog://group/join?code=...): store the code for post-auth redirect.
+  // - Password recovery links (ibblog://reset-password#access_token=...): extract tokens
+  //   and give them to Supabase, which fires the PASSWORD_RECOVERY event above.
   const handleDeepLink = useCallback(async (url: string) => {
+    const parsed = Linking.parse(url);
+    if (parsed.path === 'group/join' && parsed.queryParams?.code) {
+      setPendingInviteCode(parsed.queryParams.code as string);
+      return;
+    }
+
     const fragment = url.split('#')[1];
     if (!fragment) return;
 
@@ -121,7 +141,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => subscription.remove();
   }, [handleDeepLink]);
 
-  useProtectedRoute(session?.user ?? null, isLoading, isPasswordRecovery);
+  useProtectedRoute(
+    session?.user ?? null,
+    isLoading,
+    isPasswordRecovery,
+    pendingInviteCode,
+    () => setPendingInviteCode(null),
+  );
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
@@ -16,6 +16,7 @@ import { useAuth } from '@/providers/auth-provider';
 export default function SignUpScreen() {
   const { signUp } = useAuth();
   const router = useRouter();
+  const { invite } = useLocalSearchParams<{ invite?: string }>();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +32,15 @@ export default function SignUpScreen() {
     try {
       await signUp(email, password, username);
       Alert.alert('Success', 'Check your email for a confirmation link!', [
-        { text: 'OK', onPress: () => router.replace('/(auth)/sign-in') },
+        {
+          text: 'OK',
+          onPress: () =>
+            router.replace(
+              invite
+                ? { pathname: '/(auth)/sign-in', params: { invite } }
+                : '/(auth)/sign-in',
+            ),
+        },
       ]);
     } catch (error) {
       Alert.alert(
