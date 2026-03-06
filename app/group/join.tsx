@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
@@ -14,8 +14,9 @@ import { useJoinGroup } from '@/lib/hooks/use-groups';
 
 export default function JoinGroupScreen() {
   const router = useRouter();
+  const { code } = useLocalSearchParams<{ code?: string }>();
   const joinGroup = useJoinGroup();
-  const [inviteCode, setInviteCode] = useState('');
+  const [inviteCode, setInviteCode] = useState(code ?? '');
 
   const handleJoin = async () => {
     if (!inviteCode.trim()) {
