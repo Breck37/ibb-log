@@ -209,6 +209,10 @@ const TOTAL_W = OVERHANG * 2 + PLATES_GROUP_W * 2 + SHAFT_CENTER_W;
 // Used to compute vertical displacement when the shaft rotates.
 const PLATE_DIST = TOTAL_W / 2 - (OVERHANG + PLATES_GROUP_W / 2);
 
+// StyleSheet required: style values are derived from computed JS dimension constants
+// (TOTAL_W, ROW_H, OVERHANG, etc.) that cannot be expressed as static Tailwind classes.
+// Shadow properties (shadowColor, shadowOffset, shadowOpacity, shadowRadius) are also
+// used as Reanimated animation targets and must live in a style object.
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',

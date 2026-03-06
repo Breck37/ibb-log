@@ -75,6 +75,9 @@ export const Input = React.forwardRef<TextInput, InputProps>(
 
 Input.displayName = 'Input';
 
+// StyleSheet required: `wrapper` provides the base shadow properties (shadowColor,
+// shadowOffset, shadowOpacity, shadowRadius) that Reanimated's glowStyle merges over
+// to animate the neon glow effect. Shadow objects cannot be expressed via Tailwind.
 const styles = StyleSheet.create({
   wrapper: {
     borderWidth: 1,

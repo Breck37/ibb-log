@@ -150,6 +150,17 @@ A group workout accountability app where users track workouts, post to groups, a
 | `achievements`   | User milestone records (workout count thresholds reached)                    |
 | `weekly_reports` | Per-group weekly summaries: member qualification status, workout counts      |
 
+## Engineering Conventions
+
+### Styling
+
+- **Use Tailwind (NativeWind) for all styling** — `StyleSheet.create` is forbidden unless strictly necessary.
+- `StyleSheet` is only permitted when:
+  - Style values are derived from computed JS constants that cannot be static Tailwind classes.
+  - A style object is required as a Reanimated animation target (e.g. shadow properties animated via `useAnimatedStyle`).
+  - `StyleSheet.absoluteFillObject` is needed with a spread.
+- **Any file that uses `StyleSheet.create` must include a comment directly above the `StyleSheet.create(...)` call** explaining specifically why Tailwind cannot be used.
+
 ## Deployment & Release
 
 ### Platform
