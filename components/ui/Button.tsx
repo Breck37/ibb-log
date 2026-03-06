@@ -125,6 +125,10 @@ export function Button({
   );
 }
 
+// StyleSheet required: `base` provides the initial shadow properties (shadowColor,
+// shadowOffset, shadowOpacity, shadowRadius) that Reanimated's glowStyle merges over
+// to animate the neon glow on press. Shadow objects and borderWidth cannot be reliably
+// animated via Tailwind classes.
 const styles = StyleSheet.create({
   base: {
     borderRadius: 8,

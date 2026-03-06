@@ -1,14 +1,7 @@
 import Constants from 'expo-constants';
 import { Gear, X } from 'phosphor-react-native';
 import { useState } from 'react';
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const version = Constants.expoConfig?.version ?? '—';
@@ -23,7 +16,8 @@ export function BuildInfoButton() {
   return (
     <>
       <Pressable
-        style={[styles.trigger, { top: insets.top + 12 }]}
+        className="absolute right-6 z-10 p-1"
+        style={{ top: insets.top + 12 }}
         onPress={() => setVisible(true)}
         hitSlop={12}
       >
@@ -36,25 +30,33 @@ export function BuildInfoButton() {
         animationType="slide"
         onRequestClose={() => setVisible(false)}
       >
-        <Pressable style={styles.backdrop} onPress={() => setVisible(false)} />
+        <Pressable
+          className="flex-1 bg-black/50"
+          onPress={() => setVisible(false)}
+        />
 
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + 24 }]}>
-          <View style={styles.sheetHandle} />
+        <View
+          className="rounded-t-[20px] border-t border-forge-border bg-forge-bg px-6 pt-3"
+          style={{ paddingBottom: insets.bottom + 24 }}
+        >
+          <View className="mb-5 h-1 w-9 self-center rounded-full bg-forge-border" />
 
-          <View style={styles.sheetHeader}>
-            <Text style={styles.sheetTitle}>Build Info</Text>
+          <View className="mb-5 flex-row items-center justify-between">
+            <Text className="text-base font-semibold tracking-[1px] text-forge-text">
+              Build Info
+            </Text>
             <TouchableOpacity onPress={() => setVisible(false)} hitSlop={8}>
               <X size={20} color="#A1A1AA" weight="regular" />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.card}>
+          <View className="overflow-hidden rounded-xl border border-forge-border bg-forge-surface">
             <Row label="Version" value={`v${version}`} />
-            <View style={styles.divider} />
+            <View className="mx-4 h-px bg-forge-border" />
             <Row
               label="Environment"
               value={env}
-              valueStyle={__DEV__ ? styles.devValue : styles.prodValue}
+              valueClassName={__DEV__ ? 'text-amber-500' : 'text-green-500'}
             />
           </View>
         </View>
@@ -66,92 +68,20 @@ export function BuildInfoButton() {
 function Row({
   label,
   value,
-  valueStyle,
+  valueClassName,
 }: {
   label: string;
   value: string;
-  valueStyle?: object;
+  valueClassName?: string;
 }) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={[styles.rowValue, valueStyle]}>{value}</Text>
+    <View className="flex-row items-center justify-between px-4 py-[14px]">
+      <Text className="text-sm text-forge-muted">{label}</Text>
+      <Text
+        className={`text-sm font-semibold text-forge-text ${valueClassName ?? ''}`}
+      >
+        {value}
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  trigger: {
-    position: 'absolute',
-    right: 24,
-    zIndex: 10,
-    padding: 4,
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  sheet: {
-    backgroundColor: '#0B0D12',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderTopWidth: 1,
-    borderColor: '#1E2235',
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
-  sheetHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#1E2235',
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  sheetTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    letterSpacing: 1,
-  },
-  card: {
-    backgroundColor: '#141821',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#1E2235',
-    overflow: 'hidden',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#1E2235',
-    marginHorizontal: 16,
-  },
-  rowLabel: {
-    fontSize: 14,
-    color: '#A1A1AA',
-  },
-  rowValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  devValue: {
-    color: '#f59e0b',
-  },
-  prodValue: {
-    color: '#22c55e',
-  },
-});

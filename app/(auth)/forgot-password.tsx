@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -42,30 +41,32 @@ export default function ForgotPasswordScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.kav}
+      className="flex-1 bg-forge-bg"
     >
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerClassName="px-8 pt-20 pb-10"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Reset Password</Text>
+        <Text className="mb-3 text-center text-[28px] font-bold text-forge-text">
+          Reset Password
+        </Text>
 
         {sent ? (
           <View>
-            <Text style={styles.mutedText}>
+            <Text className="text-center text-sm leading-[22px] text-forge-muted">
               Check your email for a password reset link. You can close this
               screen and sign in after resetting your password.
             </Text>
           </View>
         ) : (
           <View>
-            <Text style={[styles.mutedText, styles.subtitle]}>
+            <Text className="mb-8 text-center text-sm leading-[22px] text-forge-muted">
               Enter your email and we&apos;ll send you a reset link
             </Text>
 
             <Input
-              style={styles.input}
+              className="mb-4"
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -75,7 +76,7 @@ export default function ForgotPasswordScreen() {
             />
 
             <Button
-              style={styles.button}
+              className="mt-2"
               title="Send Reset Link"
               onPress={handleReset}
               loading={loading}
@@ -86,37 +87,3 @@ export default function ForgotPasswordScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  kav: {
-    flex: 1,
-    backgroundColor: '#0B0D12',
-  },
-  content: {
-    paddingHorizontal: 32,
-    paddingTop: 80,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  subtitle: {
-    marginBottom: 32,
-  },
-  input: {
-    marginBottom: 16,
-  },
-  button: {
-    marginTop: 8,
-  },
-  mutedText: {
-    fontSize: 14,
-    color: '#A1A1AA',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-});

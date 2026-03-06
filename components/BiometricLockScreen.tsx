@@ -72,6 +72,9 @@ export function BiometricLockScreen() {
   );
 }
 
+// StyleSheet required: `container` spreads StyleSheet.absoluteFillObject (no Tailwind
+// equivalent), and `iconGlow` is a Reanimated animation target — useAnimatedStyle merges
+// shadowOpacity/shadowRadius over it, which requires a style object reference.
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,

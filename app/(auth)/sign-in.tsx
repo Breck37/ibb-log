@@ -1,13 +1,6 @@
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -79,27 +72,31 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-forge-bg">
       <BuildInfoButton />
       <ScrollView
-        style={StyleSheet.absoluteFill}
-        contentContainerStyle={[
-          styles.inner,
-          { paddingTop: insets.top + 48, paddingBottom: insets.bottom + 24 },
-        ]}
+        className="absolute inset-0"
+        contentContainerClassName="flex-grow px-8"
+        contentContainerStyle={{
+          paddingTop: insets.top + 48,
+          paddingBottom: insets.bottom + 24,
+        }}
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets
       >
         {/* Logo + tagline */}
-        <View style={styles.logoSection}>
+        <View className="mb-11 items-center gap-3.5">
           <BarbellLogo onAnimationComplete={handleAnimationComplete} />
-          <Animated.Text style={[styles.tagline, taglineStyle]}>
+          <Animated.Text
+            className="text-xs font-medium uppercase tracking-[3px] text-forge-muted"
+            style={taglineStyle}
+          >
             Intent. Build. Become.
           </Animated.Text>
         </View>
 
         {/* Sign-in form — fades in after animation */}
-        <Animated.View style={[styles.form, formStyle]}>
+        <Animated.View style={formStyle}>
           <Input
             glow
             className="mb-3"
@@ -122,25 +119,24 @@ export default function SignInScreen() {
           />
 
           <Link href="/(auth)/forgot-password" asChild>
-            <Pressable style={styles.forgotRow}>
-              <Text style={styles.forgotLink}>Forgot password?</Text>
+            <Pressable className="mb-5 self-end">
+              <Text className="text-[13px] text-primary">Forgot password?</Text>
             </Pressable>
           </Link>
 
           <Button
             title="Sign In"
             variant="primary"
-            className="w-full"
-            style={styles.signInButton}
+            className="mb-6 w-full"
             onPress={handleSignIn}
             loading={loading}
           />
 
           <Link href="/(auth)/sign-up" asChild>
-            <Pressable style={styles.signUpRow}>
-              <Text style={styles.mutedText}>
+            <Pressable className="items-center">
+              <Text className="text-sm text-forge-muted">
                 Don&apos;t have an account?{' '}
-                <Text style={styles.primaryText}>Sign up</Text>
+                <Text className="text-primary">Sign up</Text>
               </Text>
             </Pressable>
           </Link>
@@ -149,49 +145,3 @@ export default function SignInScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0B0D12',
-    position: 'relative',
-  },
-  inner: {
-    flexGrow: 1,
-    paddingHorizontal: 32,
-  },
-  logoSection: {
-    alignItems: 'center',
-    gap: 14,
-    marginBottom: 44,
-  },
-  tagline: {
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 3,
-    color: '#A1A1AA',
-    textTransform: 'uppercase',
-  },
-  form: {},
-  forgotRow: {
-    alignSelf: 'flex-end',
-    marginBottom: 20,
-  },
-  forgotLink: {
-    fontSize: 13,
-    color: '#454dcc',
-  },
-  signInButton: {
-    marginBottom: 24,
-  },
-  signUpRow: {
-    alignItems: 'center',
-  },
-  mutedText: {
-    fontSize: 14,
-    color: '#A1A1AA',
-  },
-  primaryText: {
-    color: '#454dcc',
-  },
-});
