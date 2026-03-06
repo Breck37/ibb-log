@@ -6,7 +6,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
 } from 'react-native';
 
@@ -47,17 +46,19 @@ export default function SignUpScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.kav}
+      className="flex-1 bg-forge-bg"
     >
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerClassName="px-8 pt-20 pb-10"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Create Account</Text>
+        <Text className="mb-8 text-center text-[28px] font-bold text-forge-text">
+          Create Account
+        </Text>
 
         <Input
-          style={styles.input}
+          className="mb-4"
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
@@ -66,7 +67,7 @@ export default function SignUpScreen() {
         />
 
         <Input
-          style={styles.input}
+          className="mb-4"
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -76,7 +77,7 @@ export default function SignUpScreen() {
         />
 
         <Input
-          style={styles.input}
+          className="mb-4"
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
@@ -85,17 +86,17 @@ export default function SignUpScreen() {
         />
 
         <Button
-          style={styles.button}
+          className="mb-5 mt-2"
           title="Sign Up"
           onPress={handleSignUp}
           loading={loading}
         />
 
         <Link href="/(auth)/sign-in" asChild>
-          <Pressable style={styles.linkRow}>
-            <Text style={styles.mutedText}>
+          <Pressable className="items-center py-2">
+            <Text className="text-center text-sm text-forge-muted">
               Already have an account?{' '}
-              <Text style={styles.linkText}>Sign in</Text>
+              <Text className="text-sm text-primary">Sign in</Text>
             </Text>
           </Pressable>
         </Link>
@@ -103,42 +104,3 @@ export default function SignUpScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  kav: {
-    flex: 1,
-    backgroundColor: '#0B0D12',
-  },
-  content: {
-    paddingHorizontal: 32,
-    paddingTop: 80,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  input: {
-    marginBottom: 16,
-  },
-  button: {
-    marginTop: 8,
-    marginBottom: 20,
-  },
-  linkRow: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  linkText: {
-    fontSize: 14,
-    color: '#454dcc',
-  },
-  mutedText: {
-    fontSize: 14,
-    color: '#A1A1AA',
-    textAlign: 'center',
-  },
-});

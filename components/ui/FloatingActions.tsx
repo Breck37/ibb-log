@@ -1,6 +1,6 @@
 import type { Icon } from 'phosphor-react-native';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 import Animated, {
   Easing,
   interpolateColor,
@@ -97,7 +97,11 @@ function ActionButton({ action }: { action: FloatingAction }) {
       accessibilityRole="button"
     >
       <Animated.View
-        style={[styles.button, isPrimary && styles.buttonPrimary, glowStyle]}
+        className={`h-14 w-14 items-center justify-center rounded-full border ${isPrimary ? 'bg-primary' : 'bg-forge-surface'}`}
+        style={[
+          { shadowColor: '#454dcc', shadowOffset: { width: 0, height: 0 } },
+          glowStyle,
+        ]}
       >
         <action.Icon
           size={22}
@@ -108,24 +112,3 @@ function ActionButton({ action }: { action: FloatingAction }) {
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#141821',
-    borderWidth: 1,
-    borderColor: '#1E2235',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#454dcc',
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 10,
-    shadowOpacity: 0,
-  },
-  buttonPrimary: {
-    backgroundColor: '#454dcc',
-    borderColor: '#454dcc',
-  },
-});
