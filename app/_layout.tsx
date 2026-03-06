@@ -11,14 +11,15 @@ import { useEffect } from 'react';
 import { useColorScheme, View } from 'react-native';
 import 'react-native-reanimated';
 
-import '../global.css';
 import { BiometricLockScreen } from '@/components/BiometricLockScreen';
+import { BuildInfoButton } from '@/components/BuildInfoButton';
 import { darkTheme, lightTheme } from '@/constants/Colors';
-import { AuthProvider } from '@/providers/auth-provider';
+import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import {
   BiometricProvider,
   useBiometric,
 } from '@/providers/biometric-provider';
+import '../global.css';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -30,8 +31,13 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-function AppShell({ colorScheme }: { colorScheme: 'light' | 'dark' | null }) {
+function AppShell({
+  colorScheme,
+}: {
+  colorScheme: 'light' | 'dark' | null | undefined;
+}) {
   const { isLocked } = useBiometric();
+  const { user } = useAuth();
 
   return (
     <View
@@ -66,6 +72,7 @@ function AppShell({ colorScheme }: { colorScheme: 'light' | 'dark' | null }) {
         </Stack>
       </ThemeProvider>
       {isLocked && <BiometricLockScreen />}
+      {user && <BuildInfoButton />}
     </View>
   );
 }

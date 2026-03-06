@@ -5,8 +5,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
-  View,
 } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
@@ -46,16 +47,17 @@ export default function SignUpScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.kav}
     >
-      <View className="flex-1 justify-center px-8">
-        <Text className="mb-2 text-center text-3xl font-bold">IBB Log</Text>
-        <Text className="mb-8 text-center text-lg text-gray-400">
-          Create Account
-        </Text>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>Create Account</Text>
 
         <Input
-          className="mb-4"
+          style={styles.input}
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
@@ -64,7 +66,7 @@ export default function SignUpScreen() {
         />
 
         <Input
-          className="mb-4"
+          style={styles.input}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -74,7 +76,7 @@ export default function SignUpScreen() {
         />
 
         <Input
-          className="mb-6"
+          style={styles.input}
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
@@ -83,20 +85,60 @@ export default function SignUpScreen() {
         />
 
         <Button
-          className="mb-4"
+          style={styles.button}
           title="Sign Up"
           onPress={handleSignUp}
           loading={loading}
         />
 
         <Link href="/(auth)/sign-in" asChild>
-          <Pressable>
-            <Text className="text-center text-sm text-blue-600">
-              Already have an account? Sign in
+          <Pressable style={styles.linkRow}>
+            <Text style={styles.mutedText}>
+              Already have an account?{' '}
+              <Text style={styles.linkText}>Sign in</Text>
             </Text>
           </Pressable>
         </Link>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  kav: {
+    flex: 1,
+    backgroundColor: '#0B0D12',
+  },
+  content: {
+    paddingHorizontal: 32,
+    paddingTop: 80,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  input: {
+    marginBottom: 16,
+  },
+  button: {
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  linkRow: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  linkText: {
+    fontSize: 14,
+    color: '#454dcc',
+  },
+  mutedText: {
+    fontSize: 14,
+    color: '#A1A1AA',
+    textAlign: 'center',
+  },
+});
