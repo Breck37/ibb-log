@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
@@ -21,6 +21,7 @@ const EASE = Easing.bezier(0.25, 0.8, 0.25, 1);
 export default function SignInScreen() {
   const { signIn } = useAuth();
   const insets = useSafeAreaInsets();
+  const { invite } = useLocalSearchParams<{ invite?: string }>();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -132,7 +133,14 @@ export default function SignInScreen() {
             loading={loading}
           />
 
-          <Link href="/(auth)/sign-up" asChild>
+          <Link
+            href={
+              invite
+                ? { pathname: '/(auth)/sign-up', params: { invite } }
+                : '/(auth)/sign-up'
+            }
+            asChild
+          >
             <Pressable className="items-center">
               <Text className="text-sm text-forge-muted">
                 Don&apos;t have an account?{' '}
