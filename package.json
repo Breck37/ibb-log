@@ -1,7 +1,7 @@
 {
   "name": "ibb-log",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "generate:splash": "node scripts/generate-splash.js",
     "pods": "cd ios && pod install",

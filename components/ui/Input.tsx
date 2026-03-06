@@ -17,7 +17,7 @@ interface InputProps extends TextInputProps {
 }
 
 const paddingClasses: Record<InputSize, string> = {
-  default: 'px-4 py-4 text-base',
+  default: 'px-4 py-5 text-base',
   sm: 'px-3 py-2 text-sm',
 };
 
