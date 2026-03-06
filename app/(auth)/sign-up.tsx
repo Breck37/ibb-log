@@ -30,17 +30,9 @@ export default function SignUpScreen() {
 
     setLoading(true);
     try {
-      await signUp(email, password, username);
+      await signUp(email, password, username, invite);
       Alert.alert('Success', 'Check your email for a confirmation link!', [
-        {
-          text: 'OK',
-          onPress: () =>
-            router.replace(
-              invite
-                ? { pathname: '/(auth)/sign-in', params: { invite } }
-                : '/(auth)/sign-in',
-            ),
-        },
+        { text: 'OK', onPress: () => router.replace('/(auth)/sign-in') },
       ]);
     } catch (error) {
       Alert.alert(
