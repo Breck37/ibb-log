@@ -1,4 +1,4 @@
-import { Gear, User } from 'phosphor-react-native';
+import { Gear, ShareNetwork, User } from 'phosphor-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import {
@@ -35,9 +35,11 @@ export default function GroupDetailScreen() {
 
   const handleShareInvite = async () => {
     if (!group) return;
+    const deepLink = `ibblog://group/join?code=${group.invite_code}`;
     try {
       await Share.share({
-        message: `Join my group "${group.name}" on IBB Log!\nUse invite code: ${group.invite_code}`,
+        message: `Join my group "${group.name}" on IBB Log!\n\nTap to join: ${deepLink}\n\nOr enter code manually: ${group.invite_code}`,
+        url: deepLink,
       });
     } catch (error) {
       if (
@@ -94,7 +96,7 @@ export default function GroupDetailScreen() {
                 {group.invite_code}
               </Text>
             </Text>
-            <FontAwesome name="share" size={13} color="#9ca3af" />
+            <ShareNetwork size={14} color="#9ca3af" weight="regular" />
           </Pressable>
           <Text className="mt-1 text-sm text-gray-500">
             {group.min_workouts_per_week} workouts/week &middot;{' '}
