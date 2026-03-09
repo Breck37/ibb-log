@@ -28,6 +28,20 @@ export const lightTheme = vars({
   '--forge-secondary-text': '109 40 217', // #6D28D9
 });
 
+// Raw hex values for use in JS-driven contexts (Reanimated animations,
+// native props like placeholderTextColor) that cannot consume CSS variables.
+// Must stay in sync with darkTheme / lightTheme above.
+export const forgePalette = {
+  dark: {
+    border: '#1E2230',
+    placeholder: '#4B5563',
+  },
+  light: {
+    border: '#E5E7EB',
+    placeholder: '#9CA3AF',
+  },
+} as const;
+
 export default {
   light: {
     text: '#111827',
