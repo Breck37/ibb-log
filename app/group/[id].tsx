@@ -1,14 +1,17 @@
-import { Gear, User } from 'phosphor-react-native';
+import { Gear, ShareNetwork, User } from 'phosphor-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
+  Share,
   Text,
   View,
 } from 'react-native';
 
+import { Forge } from '@/constants/Colors';
 import { supabase } from '@/lib/supabase';
 import { useGroupMembers } from '@/lib/hooks/use-groups';
 
@@ -31,18 +34,36 @@ export default function GroupDetailScreen() {
 
   const { data: members } = useGroupMembers(id);
 
+  const handleShareInvite = async () => {
+    if (!group) return;
+    const deepLink = `ibblog://group/join?code=${group.invite_code}`;
+    try {
+      await Share.share({
+        message: `Join my group "${group.name}" on IBB Log!\n\nTap to join: ${deepLink}\n\nOr enter code manually: ${group.invite_code}`,
+        url: deepLink,
+      });
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message !== 'The user did not share'
+      ) {
+        Alert.alert('Error', 'Could not open share sheet.');
+      }
+    }
+  };
+
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
+      <View className="flex-1 items-center justify-center bg-forge-bg">
+        <ActivityIndicator size="large" color={Forge.primary} />
       </View>
     );
   }
 
   if (!group) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">Group not found</Text>
+      <View className="flex-1 items-center justify-center bg-forge-bg">
+        <Text className="text-forge-muted">Group not found</Text>
       </View>
     );
   }
@@ -55,42 +76,56 @@ export default function GroupDetailScreen() {
           headerRight: () => (
             <Link href="/group/settings" asChild>
               <Pressable className="p-2">
-                <Gear size={20} color="#666" weight="regular" />
+                <Gear size={20} color="#A1A1AA" weight="regular" />
               </Pressable>
             </Link>
           ),
         }}
       />
-      <ScrollView className="flex-1" contentContainerClassName="p-4">
-        <View className="mb-4 rounded-lg bg-white p-4 dark:bg-gray-800">
-          <Text className="text-lg font-bold dark:text-white">
+      <ScrollView
+        className="flex-1 bg-forge-bg"
+        contentContainerClassName="p-4"
+      >
+        {/* Group info card */}
+        <View className="mb-4 rounded-xl border border-forge-border bg-forge-surface p-4">
+          <Text className="text-lg font-bold text-forge-text">
             {group.name}
           </Text>
-          <Text className="mt-2 text-sm text-gray-500">
-            Invite code: {group.invite_code}
-          </Text>
-          <Text className="mt-1 text-sm text-gray-500">
+          <Pressable
+            onPress={handleShareInvite}
+            className="mt-2 flex-row items-center gap-2 self-start"
+          >
+            <Text className="text-sm text-forge-muted">
+              Invite code:{' '}
+              <Text className="font-semibold text-forge-text">
+                {group.invite_code}
+              </Text>
+            </Text>
+            <ShareNetwork size={14} color="#A1A1AA" weight="regular" />
+          </Pressable>
+          <Text className="mt-1 text-sm text-forge-muted">
             {group.min_workouts_per_week} workouts/week &middot;{' '}
             {group.min_workout_minutes_to_qualify}min minimum
           </Text>
         </View>
 
-        <Text className="mb-2 text-lg font-semibold dark:text-white">
+        {/* Members */}
+        <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
           Members ({members?.length ?? 0})
         </Text>
         {members?.map((member) => (
           <View
             key={member.id}
-            className="mb-2 flex-row items-center rounded-lg bg-white p-3 dark:bg-gray-800"
+            className="mb-2 flex-row items-center rounded-xl border border-forge-border bg-forge-surface p-3"
           >
-            <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-              <User size={16} color="#3b82f6" weight="regular" />
+            <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-forge-elevated">
+              <User size={16} color={Forge.primary} weight="regular" />
             </View>
             <View className="flex-1">
-              <Text className="font-medium dark:text-white">
+              <Text className="font-medium text-forge-text">
                 {member.profiles?.display_name ?? member.profiles?.username}
               </Text>
-              <Text className="text-xs text-gray-500">{member.role}</Text>
+              <Text className="text-xs text-forge-muted">{member.role}</Text>
             </View>
           </View>
         ))}
