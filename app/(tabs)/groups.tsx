@@ -1,5 +1,6 @@
 import { Link } from 'expo-router';
 import { UsersThree } from 'phosphor-react-native';
+import { useEffect } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -7,24 +8,66 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Button } from '@/components/ui/Button';
+import { Forge } from '@/constants/Colors';
 import { useMyGroups } from '@/lib/hooks/use-groups';
+
+function AnimatedCard({
+  children,
+  index,
+}: {
+  children: React.ReactNode;
+  index: number;
+}) {
+  const translateY = useSharedValue(16);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    const delay = Math.min(index, 6) * 60;
+    translateY.value = withDelay(
+      delay,
+      withTiming(0, {
+        duration: 420,
+        easing: Easing.bezier(0.25, 0.8, 0.25, 1),
+      }),
+    );
+    opacity.value = withDelay(delay, withTiming(1, { duration: 420 }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
+
+  return <Animated.View style={animStyle}>{children}</Animated.View>;
+}
 
 export default function GroupsScreen() {
   const { data: groups, isLoading, error } = useMyGroups();
+  const insets = useSafeAreaInsets();
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
+      <View className="flex-1 items-center justify-center bg-forge-bg">
+        <ActivityIndicator size="large" color={Forge.primary} />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center px-4">
-        <Text className="text-red-500">
+      <View className="flex-1 items-center justify-center bg-forge-bg px-4">
+        <Text className="text-primary">
           Failed to load groups: {error.message}
         </Text>
       </View>
@@ -32,79 +75,77 @@ export default function GroupsScreen() {
   }
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-forge-bg">
       <FlatList
         data={groups}
         keyExtractor={(item) => item.id}
-        contentContainerClassName="p-4"
-        ListEmptyComponent={
-          <View className="items-center py-20">
-            <UsersThree size={48} color="#9ca3af" weight="light" />
-            <Text className="mb-2 mt-4 text-lg font-semibold text-gray-600 dark:text-gray-300">
-              No groups yet
-            </Text>
-            <Text className="mb-6 text-center text-gray-400">
-              Create or join a group to start tracking workouts together
-            </Text>
-            <View className="w-full flex-row gap-3">
+        contentContainerClassName="px-4"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        ListHeaderComponent={
+          <View style={{ paddingTop: insets.top + 20 }} className="mb-6 gap-5">
+            {/* Branded header */}
+            <View className="flex-row items-center gap-3">
+              <View className="h-6 w-[2px] bg-primary" />
+              <View>
+                <Text
+                  className="text-2xl font-bold text-forge-text"
+                  style={{ letterSpacing: 4 }}
+                >
+                  GROUPS
+                </Text>
+                <Text className="text-xs text-forge-muted">Train together</Text>
+              </View>
+            </View>
+
+            {/* Actions */}
+            <View className="flex-row gap-3">
               <Link href="/group/create" asChild>
-                <Pressable className="flex-1 rounded-lg bg-blue-600 py-3 active:bg-blue-700">
-                  <Text className="text-center font-semibold text-white">
-                    Create Group
-                  </Text>
-                </Pressable>
+                <Button className="flex-1" title="Create Group" />
               </Link>
               <Link href="/group/join" asChild>
-                <Pressable className="flex-1 rounded-lg border border-blue-600 py-3 active:bg-blue-50">
-                  <Text className="text-center font-semibold text-blue-600">
-                    Join Group
-                  </Text>
-                </Pressable>
+                <Button
+                  className="flex-1"
+                  variant="outline"
+                  title="Join Group"
+                />
               </Link>
             </View>
           </View>
         }
-        ListHeaderComponent={
-          groups && groups.length > 0 ? (
-            <View className="mb-4 flex-row gap-3">
-              <Link href="/group/create" asChild>
-                <Pressable className="flex-1 rounded-lg bg-blue-600 py-3 active:bg-blue-700">
-                  <Text className="text-center font-semibold text-white">
-                    Create Group
-                  </Text>
-                </Pressable>
-              </Link>
-              <Link href="/group/join" asChild>
-                <Pressable className="flex-1 rounded-lg border border-blue-600 py-3 active:bg-blue-50">
-                  <Text className="text-center font-semibold text-blue-600">
-                    Join Group
-                  </Text>
-                </Pressable>
-              </Link>
-            </View>
-          ) : null
+        ListEmptyComponent={
+          <View className="items-center py-20">
+            <UsersThree size={40} color="#A1A1AA" weight="light" />
+            <Text className="mb-1 mt-5 text-base font-bold tracking-widest text-forge-text">
+              NO GROUPS YET
+            </Text>
+            <Text className="text-sm text-forge-muted">
+              Create or join one to get started.
+            </Text>
+          </View>
         }
-        renderItem={({ item }) => (
-          <Link href={`/group/${item.id}`} asChild>
-            <Pressable className="mb-3 rounded-xl bg-white p-4 shadow-sm active:bg-gray-50 dark:bg-gray-800">
-              <View className="flex-row items-center">
-                <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                  <UsersThree size={20} color="#3b82f6" weight="fill" />
+        renderItem={({ item, index }) => (
+          <AnimatedCard index={index}>
+            <Link href={`/group/${item.id}`} asChild>
+              <Pressable className="mb-3 rounded-xl border border-forge-border bg-forge-surface active:opacity-70">
+                <View className="flex-row items-center p-4">
+                  <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-forge-elevated">
+                    <UsersThree size={20} color={Forge.primary} weight="fill" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="font-semibold text-forge-text">
+                      {item.name}
+                    </Text>
+                    <Text className="mt-0.5 text-xs text-forge-muted">
+                      {item.min_workouts_per_week}x/week
+                      {item.min_workout_minutes_to_qualify
+                        ? ` · ${item.min_workout_minutes_to_qualify} min minimum`
+                        : ''}
+                    </Text>
+                  </View>
                 </View>
-                <View className="flex-1">
-                  <Text className="font-semibold dark:text-white">
-                    {item.name}
-                  </Text>
-                  <Text className="mt-0.5 text-xs text-gray-500">
-                    {item.min_workouts_per_week}x/week
-                    {item.min_workout_minutes_to_qualify
-                      ? ` · ${item.min_workout_minutes_to_qualify} min minimum`
-                      : ''}
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
-          </Link>
+              </Pressable>
+            </Link>
+          </AnimatedCard>
         )}
       />
     </View>

@@ -18,6 +18,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useMyGroups } from '@/lib/hooks/use-groups';
@@ -26,10 +27,12 @@ import { useMyWorkouts } from '@/lib/hooks/use-workouts';
 import { pickSingleImage, uploadAvatar } from '@/lib/services/image-upload';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/auth-provider';
+import { Forge } from '@/constants/Colors';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
   const floatingActionPosition = useSettingsStore(
     (s) => s.floatingActionPosition,
   );
@@ -161,11 +164,28 @@ export default function ProfileScreen() {
     : null;
 
   const profileHeader = (
-    <>
+    <View style={{ paddingTop: insets.top + 20 }}>
+      {/* Branded header */}
+      <View className="mb-6 flex-row items-center gap-3">
+        <View className="h-6 w-[2px] bg-primary" />
+        <View>
+          <Text
+            className="text-2xl font-bold text-forge-text"
+            style={{ letterSpacing: 4 }}
+          >
+            PROFILE
+          </Text>
+          <Text className="text-xs text-forge-muted">
+            {profile?.username ? `@${profile.username}` : 'Your account'}
+          </Text>
+        </View>
+      </View>
+
+      {/* Avatar section */}
       <View className="mb-6 items-center">
         <Pressable onPress={handleAvatarPress} className="mb-3">
           {isUploadingAvatar ? (
-            <View className="h-24 w-24 items-center justify-center rounded-full bg-blue-100">
+            <View className="h-24 w-24 items-center justify-center rounded-full bg-forge-elevated">
               <ActivityIndicator />
             </View>
           ) : profile?.avatar_url ? (
@@ -174,16 +194,16 @@ export default function ProfileScreen() {
                 source={{ uri: profile.avatar_url }}
                 style={{ width: 96, height: 96, borderRadius: 48 }}
               />
-              <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-blue-600">
+              <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-primary">
                 <Camera size={12} color="#fff" weight="regular" />
               </View>
             </View>
           ) : (
             <View>
-              <View className="h-24 w-24 items-center justify-center rounded-full bg-blue-100">
-                <User size={36} color="#3b82f6" weight="regular" />
+              <View className="h-24 w-24 items-center justify-center rounded-full bg-forge-elevated">
+                <User size={36} color={Forge.primary} weight="regular" />
               </View>
-              <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-blue-600">
+              <View className="absolute bottom-0 right-0 h-7 w-7 items-center justify-center rounded-full bg-primary">
                 <Camera size={12} color="#fff" weight="regular" />
               </View>
             </View>
@@ -193,7 +213,7 @@ export default function ProfileScreen() {
         {isEditing ? (
           <View className="w-full gap-3 px-4">
             <View>
-              <Text className="mb-1 text-xs font-medium text-gray-500">
+              <Text className="mb-1 text-xs uppercase tracking-[2px] text-forge-muted">
                 Display Name
               </Text>
               <Input
@@ -201,11 +221,10 @@ export default function ProfileScreen() {
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Display name"
-                placeholderTextColor="#9ca3af"
               />
             </View>
             <View>
-              <Text className="mb-1 text-xs font-medium text-gray-500">
+              <Text className="mb-1 text-xs uppercase tracking-[2px] text-forge-muted">
                 Username
               </Text>
               <Input
@@ -213,7 +232,6 @@ export default function ProfileScreen() {
                 value={username}
                 onChangeText={setUsername}
                 placeholder="Username"
-                placeholderTextColor="#9ca3af"
                 autoCapitalize="none"
               />
             </View>
@@ -234,15 +252,15 @@ export default function ProfileScreen() {
           </View>
         ) : (
           <>
-            <Text className="text-xl font-bold dark:text-white">
+            <Text className="text-xl font-bold text-forge-text">
               {profile?.display_name ?? profile?.username ?? 'Loading...'}
             </Text>
-            <Text className="text-sm text-gray-500">
+            <Text className="text-sm text-forge-muted">
               @{profile?.username ?? '...'}
             </Text>
-            <Text className="mt-1 text-xs text-gray-400">{user?.email}</Text>
+            <Text className="mt-1 text-xs text-forge-muted">{user?.email}</Text>
             {memberSince && (
-              <Text className="mt-1 text-xs text-gray-400">
+              <Text className="mt-1 text-xs text-forge-muted">
                 Member since {memberSince}
               </Text>
             )}
@@ -259,7 +277,7 @@ export default function ProfileScreen() {
 
       {stats && stats.totalWorkouts > 0 && (
         <View className="mb-6">
-          <Text className="mb-2 text-sm font-semibold text-gray-500">
+          <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
             Stats
           </Text>
           <View className="flex-row flex-wrap gap-2">
@@ -280,13 +298,13 @@ export default function ProfileScreen() {
 
       {groups && groups.length > 0 && (
         <View className="mb-6">
-          <Text className="mb-2 text-sm font-semibold text-gray-500">
+          <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
             Groups
           </Text>
           {groups.map((group) => (
             <Link key={group.id} href={`/group/${group.id}`} asChild>
-              <Pressable className="mb-2 rounded-lg bg-white p-3 shadow-sm active:bg-gray-50 dark:bg-gray-800">
-                <Text className="font-medium dark:text-white">
+              <Pressable className="mb-2 rounded-lg border border-forge-border bg-forge-surface p-3 active:opacity-70">
+                <Text className="font-medium text-forge-text">
                   {group.name}
                 </Text>
               </Pressable>
@@ -296,11 +314,11 @@ export default function ProfileScreen() {
       )}
 
       <View className="mb-6">
-        <Text className="mb-2 text-sm font-semibold text-gray-500">
+        <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
           Preferences
         </Text>
-        <View className="rounded-lg bg-white p-3 shadow-sm dark:bg-gray-800">
-          <Text className="mb-3 text-sm font-medium dark:text-white">
+        <View className="rounded-xl border border-forge-border bg-forge-surface p-4">
+          <Text className="mb-3 text-sm font-medium text-forge-text">
             Floating Button Position
           </Text>
           <View className="flex-row flex-wrap gap-2">
@@ -317,7 +335,7 @@ export default function ProfileScreen() {
                 className={`flex-1 rounded-lg border py-2 ${
                   floatingActionPosition === pos
                     ? 'border-primary bg-primary/10'
-                    : 'border-gray-200 dark:border-gray-600'
+                    : 'border-forge-border'
                 }`}
                 onPress={() => setFloatingActionPosition(pos)}
               >
@@ -325,7 +343,7 @@ export default function ProfileScreen() {
                   className={`text-center text-xs font-medium capitalize ${
                     floatingActionPosition === pos
                       ? 'text-primary'
-                      : 'text-gray-500 dark:text-gray-400'
+                      : 'text-forge-muted'
                   }`}
                 >
                   {pos.replace('-', '\n')}
@@ -335,8 +353,8 @@ export default function ProfileScreen() {
           </View>
 
           {biometricSupported && (
-            <View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
-              <Text className="text-sm font-medium dark:text-white">
+            <View className="mt-4 flex-row items-center justify-between border-t border-forge-border pt-3">
+              <Text className="text-sm font-medium text-forge-text">
                 Face ID / Touch ID
               </Text>
               <Switch
@@ -350,31 +368,32 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <Pressable
-        className="mb-6 rounded-lg border border-red-300 py-3 active:bg-red-50"
+      <Button
+        variant="danger"
+        title="Sign Out"
         onPress={handleSignOut}
-      >
-        <Text className="text-center font-medium text-red-600">Sign Out</Text>
-      </Pressable>
+        className="mb-6"
+      />
 
       {workouts && workouts.length > 0 && (
-        <Text className="mb-2 text-sm font-semibold text-gray-500">
+        <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
           Your Workouts
         </Text>
       )}
-    </>
+    </View>
   );
 
   return (
     <FlatList
-      className="flex-1"
-      contentContainerClassName="p-4"
+      className="flex-1 bg-forge-bg"
+      contentContainerClassName="px-4"
+      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
       data={workouts ?? []}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={profileHeader}
       ListEmptyComponent={
         <View className="items-center py-8">
-          <Text className="text-gray-400">No workouts yet</Text>
+          <Text className="text-forge-muted">No workouts yet</Text>
         </View>
       }
       renderItem={({ item }) => <WorkoutCard workout={item} />}
@@ -384,11 +403,9 @@ export default function ProfileScreen() {
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
   return (
-    <View className="min-w-[22%] flex-1 items-center rounded-lg bg-white p-3 shadow-sm dark:bg-gray-800">
-      <Text className="text-lg font-bold text-blue-600 dark:text-blue-400">
-        {value}
-      </Text>
-      <Text className="text-xs text-gray-500">{label}</Text>
+    <View className="min-w-[22%] flex-1 items-center rounded-lg border border-forge-border bg-forge-surface p-3">
+      <Text className="text-lg font-bold text-primary">{value}</Text>
+      <Text className="text-xs text-forge-muted">{label}</Text>
     </View>
   );
 }
