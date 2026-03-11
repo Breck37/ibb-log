@@ -17,6 +17,7 @@ type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
+  pendingInviteCode: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
     email: string,
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   isLoading: true,
+  pendingInviteCode: null,
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},
@@ -233,6 +235,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         session,
         user: session?.user ?? null,
         isLoading,
+        pendingInviteCode,
         signIn,
         signUp,
         signOut,

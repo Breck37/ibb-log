@@ -19,7 +19,7 @@ import { useAuth } from '@/providers/auth-provider';
 const EASE = Easing.bezier(0.25, 0.8, 0.25, 1);
 
 export default function SignInScreen() {
-  const { signIn } = useAuth();
+  const { signIn, pendingInviteCode } = useAuth();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { invite } = useLocalSearchParams<{ invite?: string }>();
@@ -61,8 +61,11 @@ export default function SignInScreen() {
     setLoading(true);
     try {
       await signIn(email, password);
-      if (invite) {
-        router.replace({ pathname: '/group/join', params: { code: invite } });
+      // pendingInviteCode is more reliable than URL param (set by handleDeepLink
+      // in AuthProvider before the user reaches this screen)
+      const code = pendingInviteCode ?? invite;
+      if (code) {
+        router.replace({ pathname: '/group/join', params: { code } });
       }
     } catch (error) {
       Alert.alert(
@@ -139,8 +142,11 @@ export default function SignInScreen() {
 
           <Link
             href={
-              invite
-                ? { pathname: '/(auth)/sign-up', params: { invite } }
+              (pendingInviteCode ?? invite)
+                ? {
+                    pathname: '/(auth)/sign-up',
+                    params: { invite: pendingInviteCode ?? invite },
+                  }
                 : '/(auth)/sign-up'
             }
             asChild
