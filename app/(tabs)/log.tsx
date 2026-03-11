@@ -12,7 +12,9 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useMyGroups } from '@/lib/hooks/use-groups';
@@ -21,6 +23,7 @@ import { pickImages } from '@/lib/services/image-upload';
 
 export default function LogScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { data: groups } = useMyGroups();
   const createWorkout = useCreateWorkout();
   const { data: recentWorkouts } = useMyWorkouts(5);
@@ -82,7 +85,6 @@ export default function LogScreen() {
         images,
       });
 
-      Alert.alert('Success', 'Workout logged!');
       setDuration('');
       setTitle('');
       setDescription('');
@@ -102,16 +104,34 @@ export default function LogScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      className="flex-1 bg-forge-bg"
     >
       <ScrollView
         className="flex-1"
-        contentContainerClassName="p-4 pb-10"
+        contentContainerStyle={{
+          paddingTop: insets.top + 20,
+          paddingBottom: insets.bottom + 32,
+          paddingHorizontal: 16,
+        }}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Branded header */}
+        <View className="mb-6 flex-row items-center gap-3">
+          <View className="h-6 w-[2px] bg-primary" />
+          <View>
+            <Text
+              className="text-2xl font-bold text-forge-text"
+              style={{ letterSpacing: 4 }}
+            >
+              LOG
+            </Text>
+            <Text className="text-xs text-forge-muted">Record your work</Text>
+          </View>
+        </View>
+
         {showGroupSelector && (
           <>
-            <Text className="mb-2 font-medium dark:text-gray-300">
+            <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
               Post to Groups
             </Text>
             <ScrollView
@@ -125,8 +145,8 @@ export default function LogScreen() {
                   key={group.id}
                   className={`rounded-full px-4 py-2 ${
                     effectiveGroupIds.includes(group.id)
-                      ? 'bg-blue-600'
-                      : 'bg-gray-200 dark:bg-gray-700'
+                      ? 'bg-primary'
+                      : 'border border-forge-border bg-forge-elevated'
                   }`}
                   onPress={() => toggleGroup(group.id)}
                 >
@@ -134,7 +154,7 @@ export default function LogScreen() {
                     className={`text-sm font-medium ${
                       effectiveGroupIds.includes(group.id)
                         ? 'text-white'
-                        : 'dark:text-white'
+                        : 'text-forge-muted'
                     }`}
                   >
                     {group.name}
@@ -145,10 +165,11 @@ export default function LogScreen() {
           </>
         )}
 
-        <Text className="mb-2 font-medium dark:text-gray-300">
+        <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
           Duration (minutes)
         </Text>
         <Input
+          glow
           className="mb-4"
           placeholder="45"
           value={duration}
@@ -156,18 +177,22 @@ export default function LogScreen() {
           keyboardType="number-pad"
         />
 
-        <Text className="mb-2 font-medium dark:text-gray-300">Title</Text>
+        <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
+          Title
+        </Text>
         <Input
+          glow
           className="mb-4"
           placeholder="e.g. Push day: bench, OHP, dips..."
           value={title}
           onChangeText={setTitle}
         />
 
-        <Text className="mb-2 font-medium dark:text-gray-300">
+        <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
           Description (optional)
         </Text>
         <Input
+          glow
           className="mb-4"
           placeholder="How did it go?"
           value={description}
@@ -177,7 +202,9 @@ export default function LogScreen() {
           textAlignVertical="top"
         />
 
-        <Text className="mb-2 font-medium dark:text-gray-300">Photos</Text>
+        <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
+          Photos
+        </Text>
         <View className="mb-4 flex-row flex-wrap gap-2">
           {images.map((img, index) => (
             <Pressable key={img.uri} onPress={() => removeImage(index)}>
@@ -191,22 +218,23 @@ export default function LogScreen() {
             </Pressable>
           ))}
           <Pressable
-            className="h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600"
+            className="h-20 w-20 items-center justify-center rounded-lg border border-dashed border-forge-border"
             onPress={handlePickImages}
           >
-            <Text className="text-2xl text-gray-400">+</Text>
+            <Text className="text-2xl text-forge-muted">+</Text>
           </Pressable>
         </View>
 
-        <Pressable onPress={handleSubmit} disabled={createWorkout.isPending}>
-          <Text className="text-center text-base font-semibold text-white">
-            {createWorkout.isPending ? 'Logging...' : 'Log Workout'}
-          </Text>
-        </Pressable>
+        <Button
+          title="Log Workout"
+          loading={createWorkout.isPending}
+          className="mb-8"
+          onPress={handleSubmit}
+        />
 
         {recentWorkouts && recentWorkouts.length > 0 && (
           <View className="mt-8">
-            <Text className="mb-3 text-sm font-semibold text-gray-500">
+            <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
               Recent Workouts
             </Text>
             {recentWorkouts.map((workout) => (

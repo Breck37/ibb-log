@@ -1,5 +1,11 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, TextInput, type TextInputProps } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  useColorScheme,
+  type TextInputProps,
+} from 'react-native';
+import { forgePalette } from '@/constants/Colors';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -16,23 +22,25 @@ interface InputProps extends TextInputProps {
   glow?: boolean;
 }
 
-const paddingClasses: Record<InputSize, string> = {
-  default: 'px-4 py-5 text-base',
-  sm: 'px-3 py-2 text-sm',
-};
-
 export const Input = React.forwardRef<TextInput, InputProps>(
   (
     { size = 'default', glow = false, className, onFocus, onBlur, ...props },
     ref,
   ) => {
+    const palette =
+      forgePalette[useColorScheme() === 'light' ? 'light' : 'dark'];
+
     const glowProgress = useSharedValue(0);
 
     // Single progress value drives border color and outer shadow simultaneously.
     const glowStyle = useAnimatedStyle(() => ({
       borderColor: glow
-        ? interpolateColor(glowProgress.value, [0, 1], ['#1E2235', '#454dcc'])
-        : '#1E2235',
+        ? interpolateColor(
+            glowProgress.value,
+            [0, 1],
+            [palette.border, '#454dcc'],
+          )
+        : palette.border,
       shadowOpacity: glow ? glowProgress.value * 0.9 : 0,
       shadowRadius: glow ? 8 + glowProgress.value * 8 : 0,
     }));
@@ -57,13 +65,14 @@ export const Input = React.forwardRef<TextInput, InputProps>(
 
     return (
       <Animated.View
-        style={[styles.wrapper, glowStyle]}
-        className={`rounded-lg ${className ?? ''}`}
+        style={[styles.shadow, glowStyle]}
+        className={`rounded-lg bg-forge-surface ${className ?? ''}`}
       >
         <TextInput
           ref={ref}
-          className={`flex-1 dark:text-white ${paddingClasses[size]}`}
-          placeholderTextColor="#4B5563"
+          className="text-forge-text"
+          style={size === 'sm' ? styles.inputSm : styles.input}
+          placeholderTextColor={palette.placeholder}
           onFocus={handleFocus}
           onBlur={handleBlur}
           {...props}
@@ -75,17 +84,29 @@ export const Input = React.forwardRef<TextInput, InputProps>(
 
 Input.displayName = 'Input';
 
-// StyleSheet required: `wrapper` provides the base shadow properties (shadowColor,
-// shadowOffset, shadowOpacity, shadowRadius) that Reanimated's glowStyle merges over
-// to animate the neon glow effect. Shadow objects cannot be expressed via Tailwind.
+// StyleSheet required: provides base shadow properties that Reanimated's glowStyle
+// merges over to animate the neon glow effect. Shadow objects cannot be expressed
+// via Tailwind. bg/border/text colors use Tailwind tokens or forgePalette instead.
 const styles = StyleSheet.create({
-  wrapper: {
+  shadow: {
     borderWidth: 1,
-    borderColor: '#1E2235',
-    backgroundColor: '#141821',
     shadowColor: '#454dcc',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
+  },
+  // StyleSheet padding on TextInput avoids NativeWind quirks and ensures
+  // includeFontPadding:false on Android (prevents descender clipping).
+  input: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    includeFontPadding: false,
+  },
+  inputSm: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
+    includeFontPadding: false,
   },
 });
