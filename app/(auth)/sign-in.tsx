@@ -1,4 +1,4 @@
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
@@ -21,6 +21,7 @@ const EASE = Easing.bezier(0.25, 0.8, 0.25, 1);
 export default function SignInScreen() {
   const { signIn } = useAuth();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { invite } = useLocalSearchParams<{ invite?: string }>();
 
   const [email, setEmail] = useState('');
@@ -60,6 +61,9 @@ export default function SignInScreen() {
     setLoading(true);
     try {
       await signIn(email, password);
+      if (invite) {
+        router.replace({ pathname: '/group/join', params: { code: invite } });
+      }
     } catch (error) {
       Alert.alert(
         'Sign In Failed',

@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
@@ -84,6 +85,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     null,
   );
   const router = useRouter();
+  // Ref so handleDeepLink (stable useCallback) can read current session
+  // without being recreated every time session changes.
+  const sessionRef = useRef<Session | null>(null);
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -115,7 +122,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const handleDeepLink = useCallback(async (url: string) => {
     const parsed = Linking.parse(url);
     if (parsed.path === 'group/join' && parsed.queryParams?.code) {
-      setPendingInviteCode(parsed.queryParams.code as string);
+      const code = parsed.queryParams.code as string;
+      setPendingInviteCode(code);
+      // If user isn't signed in, send them to sign-in carrying the invite code.
+      // useProtectedRoute would redirect there anyway, but without the param.
+      if (!sessionRef.current) {
+        router.replace({
+          pathname: '/(auth)/sign-in',
+          params: { invite: code },
+        });
+      }
       // Don't return — fall through to process auth tokens if this is a confirmation redirect.
     }
 
@@ -187,7 +203,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         data: { username },
         emailRedirectTo: invite
           ? `ibblog://group/join?code=${encodeURIComponent(invite)}`
-          : undefined,
+          : 'ibblog://',
       },
     });
     if (error) throw error;
