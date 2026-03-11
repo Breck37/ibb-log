@@ -11,16 +11,29 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useJoinGroup } from '@/lib/hooks/use-groups';
+import { setPendingInvite, useAuth } from '@/providers/auth-provider';
 
 export default function JoinGroupScreen() {
   const router = useRouter();
   const joinGroup = useJoinGroup();
   const { code } = useLocalSearchParams<{ code?: string }>();
+  const { user, isLoading } = useAuth();
   const [inviteCode, setInviteCode] = useState('');
 
   useEffect(() => {
     if (code) setInviteCode(code);
   }, [code]);
+
+  // When this screen mounts with a code but no session, store the code in the
+  // module-level variable so useProtectedRoute can redirect to join after sign-in.
+  // This is the most reliable source — Expo Router always routes here directly
+  // from the deep link before any auth redirect happens.
+  useEffect(() => {
+    if (isLoading) return;
+    if (!user && code) {
+      setPendingInvite(code);
+    }
+  }, [user, isLoading, code]);
 
   const handleJoin = async () => {
     if (!inviteCode.trim()) {

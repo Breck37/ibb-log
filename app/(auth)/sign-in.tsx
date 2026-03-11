@@ -1,4 +1,4 @@
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
@@ -19,9 +19,8 @@ import { useAuth } from '@/providers/auth-provider';
 const EASE = Easing.bezier(0.25, 0.8, 0.25, 1);
 
 export default function SignInScreen() {
-  const { signIn, pendingInviteCode } = useAuth();
+  const { signIn } = useAuth();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { invite } = useLocalSearchParams<{ invite?: string }>();
 
   const [email, setEmail] = useState('');
@@ -61,12 +60,8 @@ export default function SignInScreen() {
     setLoading(true);
     try {
       await signIn(email, password);
-      // pendingInviteCode is more reliable than URL param (set by handleDeepLink
-      // in AuthProvider before the user reaches this screen)
-      const code = pendingInviteCode ?? invite;
-      if (code) {
-        router.replace({ pathname: '/group/join', params: { code } });
-      }
+      // useProtectedRoute in AuthProvider handles redirect to /group/join
+      // if a pending invite was stored (from deep link or join screen).
     } catch (error) {
       Alert.alert(
         'Sign In Failed',
@@ -142,11 +137,8 @@ export default function SignInScreen() {
 
           <Link
             href={
-              (pendingInviteCode ?? invite)
-                ? {
-                    pathname: '/(auth)/sign-up',
-                    params: { invite: pendingInviteCode ?? invite },
-                  }
+              invite
+                ? { pathname: '/(auth)/sign-up', params: { invite } }
                 : '/(auth)/sign-up'
             }
             asChild

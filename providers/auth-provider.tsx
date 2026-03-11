@@ -13,11 +13,19 @@ import {
 
 import { supabase } from '@/lib/supabase';
 
+// Module-level variable — synchronous reads/writes, no React render cycle dependency.
+// Set by handleDeepLink (app killed → reopened) and by join.tsx (app already running).
+// Consumed by useProtectedRoute when the user lands in the auth group after sign-in.
+let _pendingInvite: string | null = null;
+
+export function setPendingInvite(code: string | null) {
+  _pendingInvite = code;
+}
+
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
-  pendingInviteCode: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
     email: string,
@@ -34,7 +42,6 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   isLoading: true,
-  pendingInviteCode: null,
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},
@@ -50,15 +57,12 @@ function useProtectedRoute(
   user: User | null,
   isLoading: boolean,
   isPasswordRecovery: boolean,
-  pendingInviteCode: string | null,
-  clearPendingInvite: () => void,
 ) {
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
-
     if (isPasswordRecovery) return;
 
     const inAuthGroup = segments[0] === '(auth)';
@@ -66,29 +70,23 @@ function useProtectedRoute(
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/sign-in');
     } else if (user && inAuthGroup) {
-      if (pendingInviteCode) {
-        router.replace({
-          pathname: '/group/join',
-          params: { code: pendingInviteCode },
-        });
-        clearPendingInvite();
+      // Consume the module-level pending invite synchronously — no timing issues.
+      const code = _pendingInvite;
+      if (code) {
+        _pendingInvite = null;
+        router.replace({ pathname: '/group/join', params: { code } });
       } else {
         router.replace('/(tabs)');
       }
     }
-  }, [user, segments, isLoading, isPasswordRecovery, pendingInviteCode]);
+  }, [user, segments, isLoading, isPasswordRecovery]);
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
-  const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(
-    null,
-  );
   const router = useRouter();
-  // Ref so handleDeepLink (stable useCallback) can read current session
-  // without being recreated every time session changes.
   const sessionRef = useRef<Session | null>(null);
   useEffect(() => {
     sessionRef.current = session;
@@ -115,7 +113,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   // When the app is opened via a deep link, the OS hands us the full URL.
-  // - Invite links (ibblog://group/join?code=...): store the code for post-auth redirect.
+  // - Invite links (ibblog://group/join?code=...): store the code in _pendingInvite.
   //   The code may also arrive here embedded in a Supabase email-confirmation redirect
   //   (ibblog://group/join?code=INVITE#access_token=...&type=signup), in which case we
   //   store the code AND process the auth tokens so the user is signed in automatically.
@@ -124,16 +122,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const handleDeepLink = useCallback(async (url: string) => {
     const parsed = Linking.parse(url);
     if (parsed.path === 'group/join' && parsed.queryParams?.code) {
-      const code = parsed.queryParams.code as string;
-      setPendingInviteCode(code);
-      // If user isn't signed in, send them to sign-in carrying the invite code.
-      // useProtectedRoute would redirect there anyway, but without the param.
-      if (!sessionRef.current) {
-        router.replace({
-          pathname: '/(auth)/sign-in',
-          params: { invite: code },
-        });
-      }
+      // Set the module-level variable synchronously so useProtectedRoute can
+      // read it in the same render cycle after sign-in completes.
+      _pendingInvite = parsed.queryParams.code as string;
       // Don't return — fall through to process auth tokens if this is a confirmation redirect.
     }
 
@@ -176,13 +167,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => subscription.remove();
   }, [handleDeepLink]);
 
-  useProtectedRoute(
-    session?.user ?? null,
-    isLoading,
-    isPasswordRecovery,
-    pendingInviteCode,
-    () => setPendingInviteCode(null),
-  );
+  useProtectedRoute(session?.user ?? null, isLoading, isPasswordRecovery);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -235,7 +220,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
         session,
         user: session?.user ?? null,
         isLoading,
-        pendingInviteCode,
         signIn,
         signUp,
         signOut,
