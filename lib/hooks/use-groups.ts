@@ -41,7 +41,6 @@ export function useCreateGroup() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log('!', { user });
       if (!user) throw new Error('Not authenticated');
 
       const { data: group, error: groupError } = await supabase
@@ -49,7 +48,6 @@ export function useCreateGroup() {
         .insert({ ...input, created_by: user.id })
         .select()
         .single();
-      console.log({ group, groupError });
       if (groupError) throw groupError;
 
       const { error: memberError } = await supabase
