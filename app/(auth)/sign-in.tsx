@@ -10,7 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BarbellLogo, LOGO_TEXT_DELAY } from '@/components/BarbellLogo';
+import { LOGO_TEXT_DELAY } from '@/components/BarbellLogo';
+import { BarbellLogoNeon } from '@/components/BarbellLogoNeon';
 import { BuildInfoButton } from '@/components/BuildInfoButton';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -86,7 +87,9 @@ export default function SignInScreen() {
       >
         {/* Logo + tagline */}
         <View className="mb-11 items-center gap-3.5">
-          <BarbellLogo onAnimationComplete={handleAnimationComplete} />
+          <BarbellLogoNeon onAnimationComplete={handleAnimationComplete} />
+          {/* <BarbellLogo onAnimationComplete={handleAnimationComplete} /> */}
+          {/* <NeonSignLogo /> */}
           <Animated.Text
             className="text-xs font-medium uppercase tracking-[3px] text-forge-muted"
             style={taglineStyle}
