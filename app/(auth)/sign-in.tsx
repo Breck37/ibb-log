@@ -113,11 +113,11 @@ export default function SignInScreen() {
 
           <Input
             glow
+            showToggle
             className="mb-2"
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
             textContentType="password"
           />
 
