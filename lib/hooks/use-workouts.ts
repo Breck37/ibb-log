@@ -105,7 +105,7 @@ export type FeedWorkout = {
   image_urls: string[];
   created_at: string;
   is_qualified: boolean;
-  groupName: string;
+  groupNames: string[];
   profiles: {
     username: string;
     display_name: string | null;
@@ -132,17 +132,40 @@ export function useFeedWorkouts() {
 
       if (groupError) throw groupError;
 
-      const groupFeed = (groupData ?? []).map((row) => ({
-        id: row.workouts!.id,
-        duration_minutes: row.workouts!.duration_minutes,
-        title: row.workouts!.title,
-        description: row.workouts!.description,
-        image_urls: row.workouts!.image_urls ?? [],
-        created_at: row.workouts!.created_at,
-        is_qualified: row.is_qualified,
-        groupName: row.groups?.name ?? '',
-        profiles: row.workouts!.profiles,
-      }));
+      // Aggregate by workout ID — collect all group names the viewer has access to
+      const groupFeedMap = (groupData ?? []).reduce<Map<string, FeedWorkout>>(
+        (acc, row) => {
+          const workoutId = row.workouts!.id;
+          const existing = acc.get(workoutId);
+          const groupName = row.groups?.name;
+
+          if (existing) {
+            if (groupName && !existing.groupNames.includes(groupName)) {
+              existing.groupNames.push(groupName);
+            }
+            // A workout is qualified if it's qualified in ANY of its groups
+            if (row.is_qualified) {
+              existing.is_qualified = true;
+            }
+          } else {
+            acc.set(workoutId, {
+              id: workoutId,
+              duration_minutes: row.workouts!.duration_minutes,
+              title: row.workouts!.title,
+              description: row.workouts!.description,
+              image_urls: row.workouts!.image_urls ?? [],
+              created_at: row.workouts!.created_at,
+              is_qualified: row.is_qualified,
+              groupNames: groupName ? [groupName] : [],
+              profiles: row.workouts!.profiles,
+            });
+          }
+          return acc;
+        },
+        new Map(),
+      );
+
+      const groupFeed = Array.from(groupFeedMap.values());
 
       // Fetch user's own workouts not posted to any group
       const groupWorkoutIds = new Set(groupFeed.map((w) => w.id));
@@ -165,7 +188,7 @@ export function useFeedWorkouts() {
           image_urls: w.image_urls ?? [],
           created_at: w.created_at,
           is_qualified: false,
-          groupName: '',
+          groupNames: [],
           profiles: w.profiles,
         }));
 
@@ -209,7 +232,7 @@ export function useMyWorkouts(limit?: number) {
           image_urls: row.image_urls ?? [],
           created_at: row.created_at,
           is_qualified: firstGw?.is_qualified ?? false,
-          groupName: firstGw?.groups?.name ?? '',
+          groupNames: firstGw?.groups?.name ? [firstGw.groups.name] : [],
           profiles: null,
         } satisfies FeedWorkout;
       });

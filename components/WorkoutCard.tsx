@@ -44,10 +44,10 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
           <Text className="font-semibold text-forge-text">{displayName}</Text>
           <Text className="text-xs text-forge-muted">{timeAgo}</Text>
         </View>
-        {workout.groupName ? (
+        {workout.groupNames.length > 0 ? (
           <View className="mr-2 rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1">
             <Text className="text-xs font-medium text-forge-secondary-text">
-              {workout.groupName}
+              {workout.groupNames.join(' • ')}
             </Text>
           </View>
         ) : null}

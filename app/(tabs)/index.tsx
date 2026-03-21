@@ -72,7 +72,7 @@ export default function FeedScreen() {
     <View className="flex-1 bg-forge-bg">
       <FlatList
         data={workouts}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         contentContainerClassName="px-4"
         ListEmptyComponent={
