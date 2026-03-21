@@ -65,20 +65,20 @@ export default function ResetPasswordScreen() {
         </Text>
 
         <Input
+          showToggle
           className="mb-4"
           placeholder="New Password"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
           textContentType="newPassword"
         />
 
         <Input
+          showToggle
           className="mb-6"
           placeholder="Confirm Password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          secureTextEntry
           textContentType="newPassword"
         />
 

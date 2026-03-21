@@ -93,8 +93,8 @@ const glowStyle = useAnimatedStyle(() => ({
   ),
   shadowColor: '#454dcc',
   shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: glowProgress.value * 0.9,
-  shadowRadius: 8 + glowProgress.value * 8,
+  shadowOpacity: glowProgress.value,
+  shadowRadius: 8 + glowProgress.value * 32,
 }));
 ```
 

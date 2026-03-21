@@ -1,6 +1,6 @@
 import { Gear, ShareNetwork, User } from 'phosphor-react-native';
 import { useQuery } from '@tanstack/react-query';
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Alert,
@@ -10,13 +10,66 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { Forge } from '@/constants/Colors';
 import { supabase } from '@/lib/supabase';
 import { useGroupMembers } from '@/lib/hooks/use-groups';
 
+function InviteButton({ onPress }: { onPress: () => void }) {
+  const glowProgress = useSharedValue(0);
+
+  const glowStyle = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      glowProgress.value,
+      [0, 1],
+      ['#454dcc', '#9098f5'],
+    ),
+    shadowOpacity: glowProgress.value,
+    shadowRadius: 8 + glowProgress.value * 32,
+  }));
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => {
+        glowProgress.value = withTiming(1, { duration: 150 });
+      }}
+      onPressOut={() => {
+        glowProgress.value = withTiming(0, { duration: 200 });
+      }}
+    >
+      <Animated.View
+        className="flex-row items-center gap-1.5 rounded-lg px-4 py-2.5"
+        style={[
+          {
+            borderWidth: 1,
+            borderColor: '#454dcc',
+            shadowColor: '#454dcc',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0,
+            shadowRadius: 0,
+          },
+          glowStyle,
+        ]}
+      >
+        <ShareNetwork size={14} color={Forge.primary} weight="bold" />
+        <Text className="text-xs font-semibold tracking-widest text-primary">
+          INVITE
+        </Text>
+      </Animated.View>
+    </Pressable>
+  );
+}
+
 export default function GroupDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
 
   const { data: group, isLoading } = useQuery({
     queryKey: ['group', id],
@@ -60,12 +113,9 @@ export default function GroupDetailScreen() {
     );
   }
 
-  if (!group) {
-    return (
-      <View className="flex-1 items-center justify-center bg-forge-bg">
-        <Text className="text-forge-muted">Group not found</Text>
-      </View>
-    );
+  if (!group && !isLoading) {
+    router.replace('/(tabs)/groups');
+    return null;
   }
 
   return (
@@ -87,26 +137,17 @@ export default function GroupDetailScreen() {
         contentContainerClassName="p-4"
       >
         {/* Group info card */}
-        <View className="mb-4 rounded-xl border border-forge-border bg-forge-surface p-4">
-          <Text className="text-lg font-bold text-forge-text">
-            {group.name}
-          </Text>
-          <Pressable
-            onPress={handleShareInvite}
-            className="mt-2 flex-row items-center gap-2 self-start"
-          >
-            <Text className="text-sm text-forge-muted">
-              Invite code:{' '}
-              <Text className="font-semibold text-forge-text">
-                {group.invite_code}
-              </Text>
+        <View className="mb-4 flex-row items-center rounded-xl border border-forge-border bg-forge-surface p-4">
+          <View className="flex-1">
+            <Text className="text-lg font-bold text-forge-text">
+              {group.name}
             </Text>
-            <ShareNetwork size={14} color="#A1A1AA" weight="regular" />
-          </Pressable>
-          <Text className="mt-1 text-sm text-forge-muted">
-            {group.min_workouts_per_week} workouts/week &middot;{' '}
-            {group.min_workout_minutes_to_qualify}min minimum
-          </Text>
+            <Text className="mt-1 text-sm text-forge-muted">
+              {group.min_workouts_per_week} workouts/week &middot;{' '}
+              {group.min_workout_minutes_to_qualify}min minimum
+            </Text>
+          </View>
+          <InviteButton onPress={handleShareInvite} />
         </View>
 
         {/* Members */}
