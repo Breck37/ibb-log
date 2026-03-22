@@ -53,21 +53,6 @@ export function WorkoutCard({ workout, onEdit }: WorkoutCardProps) {
           <Text className="font-semibold text-forge-text">{displayName}</Text>
           <Text className="text-xs text-forge-muted">{timeAgo}</Text>
         </View>
-        {workout.groupNames.map((name) => (
-          <View
-            key={name}
-            className="mr-1 rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1"
-          >
-            <Text className="text-xs font-medium text-forge-secondary-text">
-              {name}
-            </Text>
-          </View>
-        ))}
-        {workout.is_qualified && (
-          <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
-            <Text className="text-xs font-medium text-primary">Qualified</Text>
-          </View>
-        )}
         {onEdit && (
           <Pressable
             onPress={onEdit}
@@ -105,6 +90,29 @@ export function WorkoutCard({ workout, onEdit }: WorkoutCardProps) {
             />
           ))}
         </ScrollView>
+      )}
+
+      {/* Labels footer — right-aligned below all content */}
+      {(workout.groupNames.length > 0 || workout.is_qualified) && (
+        <View className="mt-3 flex-row flex-wrap justify-end gap-1.5">
+          {workout.groupNames.map((name) => (
+            <View
+              key={name}
+              className="rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1"
+            >
+              <Text className="text-xs font-medium text-forge-secondary-text">
+                {name}
+              </Text>
+            </View>
+          ))}
+          {workout.is_qualified && (
+            <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
+              <Text className="text-xs font-medium text-primary">
+                Qualified
+              </Text>
+            </View>
+          )}
+        </View>
       )}
     </View>
   );
