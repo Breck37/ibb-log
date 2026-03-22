@@ -18,8 +18,8 @@ export function BiometricLockScreen() {
 
   const glowProgress = useSharedValue(0);
   const iconStyle = useAnimatedStyle(() => ({
-    shadowOpacity: glowProgress.value * 0.9,
-    shadowRadius: 8 + glowProgress.value * 20,
+    shadowOpacity: glowProgress.value,
+    shadowRadius: 8 + glowProgress.value * 34,
   }));
 
   useEffect(() => {

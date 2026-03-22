@@ -6,18 +6,33 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
+// Module-level variable — synchronous reads/writes, no React render cycle dependency.
+// Set by handleDeepLink (app killed → reopened) and by join.tsx (app already running).
+// Consumed by useProtectedRoute when the user lands in the auth group after sign-in.
+let _pendingInvite: string | null = null;
+
+export function setPendingInvite(code: string | null) {
+  _pendingInvite = code;
+}
+
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, username: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    username: string,
+    invite?: string,
+  ) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -48,7 +63,6 @@ function useProtectedRoute(
 
   useEffect(() => {
     if (isLoading) return;
-
     if (isPasswordRecovery) return;
 
     const inAuthGroup = segments[0] === '(auth)';
@@ -56,7 +70,14 @@ function useProtectedRoute(
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/sign-in');
     } else if (user && inAuthGroup) {
-      router.replace('/(tabs)');
+      // Consume the module-level pending invite synchronously — no timing issues.
+      const code = _pendingInvite;
+      if (code) {
+        _pendingInvite = null;
+        router.replace({ pathname: '/group/join', params: { code } });
+      } else {
+        router.replace('/(tabs)');
+      }
     }
   }, [user, segments, isLoading, isPasswordRecovery]);
 }
@@ -66,6 +87,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [isLoading, setIsLoading] = useState(true);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const router = useRouter();
+  const sessionRef = useRef<Session | null>(null);
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -87,10 +112,22 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // When the app is opened via a deep link (e.g. ibblog://reset-password#access_token=...),
-  // the OS hands us the full URL. We extract the tokens from the hash fragment and give
-  // them to Supabase, which then fires the PASSWORD_RECOVERY event above.
+  // When the app is opened via a deep link, the OS hands us the full URL.
+  // - Invite links (ibblog://group/join?code=...): store the code in _pendingInvite.
+  //   The code may also arrive here embedded in a Supabase email-confirmation redirect
+  //   (ibblog://group/join?code=INVITE#access_token=...&type=signup), in which case we
+  //   store the code AND process the auth tokens so the user is signed in automatically.
+  // - Password recovery links (ibblog://reset-password#access_token=...): extract tokens
+  //   and give them to Supabase, which fires the PASSWORD_RECOVERY event above.
   const handleDeepLink = useCallback(async (url: string) => {
+    const parsed = Linking.parse(url);
+    if (parsed.path === 'group/join' && parsed.queryParams?.code) {
+      // Set the module-level variable synchronously so useProtectedRoute can
+      // read it in the same render cycle after sign-in completes.
+      _pendingInvite = parsed.queryParams.code as string;
+      // Don't return — fall through to process auth tokens if this is a confirmation redirect.
+    }
+
     const fragment = url.split('#')[1];
     if (!fragment) return;
 
@@ -99,11 +136,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const refreshToken = params.get('refresh_token');
     const type = params.get('type');
 
-    if (accessToken && refreshToken && type === 'recovery') {
+    if (
+      accessToken &&
+      refreshToken &&
+      (type === 'recovery' || type === 'signup')
+    ) {
       await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
       });
+      if (type === 'recovery') {
+        setIsPasswordRecovery(true);
+        router.replace('/reset-password');
+      }
+      // For signup: onAuthStateChange fires SIGNED_IN → useProtectedRoute handles navigation.
     }
   }, []);
 
@@ -131,11 +177,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (error) throw error;
   };
 
-  const signUp = async (email: string, password: string, username: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    username: string,
+    invite?: string,
+  ) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { username } },
+      options: {
+        data: { username },
+        emailRedirectTo: invite
+          ? `ibblog://group/join?code=${encodeURIComponent(invite)}`
+          : 'ibblog://',
+      },
     });
     if (error) throw error;
   };

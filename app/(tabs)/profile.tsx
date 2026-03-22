@@ -1,8 +1,14 @@
 import { Button, Input } from '@/components/ui/';
-import { Camera, User } from 'phosphor-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
+import { Camera, User } from 'phosphor-react-native';
 import { useState } from 'react';
+
+import {
+  EditWorkoutModal,
+  type EditableWorkout,
+} from '@/components/EditWorkoutModal';
+import type { FeedWorkout } from '@/lib/hooks/use-workouts';
 import {
   useSettingsStore,
   type FloatingActionPosition,
@@ -21,13 +27,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { WorkoutCard } from '@/components/WorkoutCard';
+import { Forge } from '@/constants/Colors';
 import { useMyGroups } from '@/lib/hooks/use-groups';
 import { useUserStats } from '@/lib/hooks/use-stats';
 import { useMyWorkouts } from '@/lib/hooks/use-workouts';
 import { pickSingleImage, uploadAvatar } from '@/lib/services/image-upload';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/auth-provider';
-import { Forge } from '@/constants/Colors';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
@@ -62,6 +68,9 @@ export default function ProfileScreen() {
   const [username, setUsername] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(
+    null,
+  );
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -384,20 +393,30 @@ export default function ProfileScreen() {
   );
 
   return (
-    <FlatList
-      className="flex-1 bg-forge-bg"
-      contentContainerClassName="px-4"
-      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-      data={workouts ?? []}
-      keyExtractor={(item) => item.id}
-      ListHeaderComponent={profileHeader}
-      ListEmptyComponent={
-        <View className="items-center py-8">
-          <Text className="text-forge-muted">No workouts yet</Text>
-        </View>
-      }
-      renderItem={({ item }) => <WorkoutCard workout={item} />}
-    />
+    <>
+      <FlatList
+        className="flex-1 bg-forge-bg"
+        contentContainerClassName="px-4"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        data={workouts ?? []}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={profileHeader}
+        ListEmptyComponent={
+          <View className="items-center py-8">
+            <Text className="text-forge-muted">No workouts yet</Text>
+          </View>
+        }
+        renderItem={({ item }: { item: FeedWorkout }) => (
+          <WorkoutCard workout={item} onEdit={() => setEditingWorkout(item)} />
+        )}
+      />
+
+      <EditWorkoutModal
+        workout={editingWorkout}
+        visible={!!editingWorkout}
+        onClose={() => setEditingWorkout(null)}
+      />
+    </>
   );
 }
 

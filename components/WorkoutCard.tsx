@@ -1,5 +1,12 @@
-import { User } from 'phosphor-react-native';
-import { Image, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { PencilSimple, User } from 'phosphor-react-native';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
 
 import { Forge } from '@/constants/Colors';
 import type { FeedWorkout } from '@/lib/hooks/use-workouts';
@@ -22,9 +29,11 @@ const darkShadow = {
 
 type WorkoutCardProps = {
   workout: FeedWorkout;
+  /** Called when the user taps the edit button. Only provide this for workouts the current user owns. */
+  onEdit?: () => void;
 };
 
-export function WorkoutCard({ workout }: WorkoutCardProps) {
+export function WorkoutCard({ workout, onEdit }: WorkoutCardProps) {
   const displayName =
     workout.profiles?.display_name ?? workout.profiles?.username ?? 'You';
   const timeAgo = getTimeAgo(workout.created_at);
@@ -44,17 +53,14 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
           <Text className="font-semibold text-forge-text">{displayName}</Text>
           <Text className="text-xs text-forge-muted">{timeAgo}</Text>
         </View>
-        {workout.groupName ? (
-          <View className="mr-2 rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1">
-            <Text className="text-xs font-medium text-forge-secondary-text">
-              {workout.groupName}
-            </Text>
-          </View>
-        ) : null}
-        {workout.is_qualified && (
-          <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
-            <Text className="text-xs font-medium text-primary">Qualified</Text>
-          </View>
+        {onEdit && (
+          <Pressable
+            onPress={onEdit}
+            hitSlop={8}
+            className="ml-2 h-7 w-7 items-center justify-center rounded-full bg-forge-elevated active:bg-forge-border"
+          >
+            <PencilSimple size={12} color={Forge.primary} weight="bold" />
+          </Pressable>
         )}
       </View>
 
@@ -84,6 +90,29 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
             />
           ))}
         </ScrollView>
+      )}
+
+      {/* Labels footer — right-aligned below all content */}
+      {(workout.groupNames.length > 0 || workout.is_qualified) && (
+        <View className="mt-3 flex-row flex-wrap justify-end gap-1.5">
+          {workout.groupNames.map((name) => (
+            <View
+              key={name}
+              className="rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1"
+            >
+              <Text className="text-xs font-medium text-forge-secondary-text">
+                {name}
+              </Text>
+            </View>
+          ))}
+          {workout.is_qualified && (
+            <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
+              <Text className="text-xs font-medium text-primary">
+                Qualified
+              </Text>
+            </View>
+          )}
+        </View>
       )}
     </View>
   );
