@@ -239,9 +239,6 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
           <Pressable onPress={handleCancel} hitSlop={8} className="py-1 pr-4">
             <Text className="text-forge-muted">Cancel</Text>
           </Pressable>
-          <Pressable onPress={handleDelete} hitSlop={8} className="py-1 pr-4">
-            <Text className="text-red-500">Delete</Text>
-          </Pressable>
 
           <View className="flex-1 items-center">
             <Text className="font-semibold text-forge-text">Edit Workout</Text>
@@ -363,6 +360,14 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
                 <FontAwesome name="plus" size={20} color="#9ca3af" />
               </Pressable>
             </View>
+
+            <Pressable
+              onPress={handleDelete}
+              className="mt-10 items-center py-3"
+              hitSlop={8}
+            >
+              <Text className="text-sm text-red-500">Delete Workout</Text>
+            </Pressable>
           </ScrollView>
         )}
       </KeyboardAvoidingView>
