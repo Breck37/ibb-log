@@ -12,7 +12,10 @@ import {
   View,
 } from 'react-native';
 
-import { EditWorkoutModal, type EditableWorkout } from '@/components/EditWorkoutModal';
+import {
+  EditWorkoutModal,
+  type EditableWorkout,
+} from '@/components/EditWorkoutModal';
 import { supabase } from '@/lib/supabase';
 import {
   useAddComment,
@@ -28,7 +31,9 @@ export default function WorkoutDetailScreen() {
   const { id: groupWorkoutId } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const [commentText, setCommentText] = useState('');
-  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(null);
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(
+    null,
+  );
 
   const { data: groupWorkout, isLoading } = useQuery({
     queryKey: ['group-workout', groupWorkoutId],

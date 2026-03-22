@@ -366,7 +366,9 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
               className="mt-10 items-center py-3"
               hitSlop={8}
             >
-              <Text className="text-sm text-red-500">Delete Workout</Text>
+              <Text className="text-base font-medium text-red-500">
+                Delete Workout
+              </Text>
             </Pressable>
           </ScrollView>
         )}
