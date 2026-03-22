@@ -205,18 +205,26 @@ export function useFeedWorkouts() {
 
       if (groupError) throw groupError;
 
-      const groupFeed = (groupData ?? []).map((row) => ({
-        id: row.workouts!.id,
-        user_id: row.workouts!.user_id,
-        duration_minutes: row.workouts!.duration_minutes,
-        title: row.workouts!.title,
-        description: row.workouts!.description,
-        image_urls: row.workouts!.image_urls ?? [],
-        created_at: row.workouts!.created_at,
-        is_qualified: row.is_qualified,
-        groupName: row.groups?.name ?? '',
-        profiles: row.workouts!.profiles,
-      }));
+      // Deduplicate by workout ID — a workout posted to multiple groups appears once per group in the join
+      const seenGroupWorkoutIds = new Set<string>();
+      const groupFeed = (groupData ?? [])
+        .filter((row) => {
+          if (seenGroupWorkoutIds.has(row.workouts!.id)) return false;
+          seenGroupWorkoutIds.add(row.workouts!.id);
+          return true;
+        })
+        .map((row) => ({
+          id: row.workouts!.id,
+          user_id: row.workouts!.user_id,
+          duration_minutes: row.workouts!.duration_minutes,
+          title: row.workouts!.title,
+          description: row.workouts!.description,
+          image_urls: row.workouts!.image_urls ?? [],
+          created_at: row.workouts!.created_at,
+          is_qualified: row.is_qualified,
+          groupName: row.groups?.name ?? '',
+          profiles: row.workouts!.profiles,
+        }));
 
       // Fetch user's own workouts not posted to any group
       const groupWorkoutIds = new Set(groupFeed.map((w) => w.id));
