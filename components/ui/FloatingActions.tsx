@@ -78,10 +78,10 @@ function ActionButton({ action }: { action: FloatingAction }) {
     borderColor: interpolateColor(
       glowProgress.value,
       [0, 1],
-      [isPrimary ? '#454dcc' : '#1E2235', '#454dcc'],
+      [isPrimary ? '#454dcc' : '#1E2235', '#9098f5'],
     ),
-    shadowOpacity: glowProgress.value * 0.9,
-    shadowRadius: 8 + glowProgress.value * 8,
+    shadowOpacity: glowProgress.value,
+    shadowRadius: 8 + glowProgress.value * 32,
   }));
 
   return (

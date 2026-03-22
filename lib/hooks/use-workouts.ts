@@ -6,6 +6,97 @@ import { uploadMultipleImages } from '@/lib/services/image-upload';
 
 import type { ImagePickerAsset } from 'expo-image-picker';
 
+type UpdateWorkoutInput = {
+  workoutId: string;
+  title: string;
+  description: string | null;
+  durationMinutes: number;
+  keptImageUrls: string[];
+  newImages: ImagePickerAsset[];
+};
+
+export function useUpdateWorkout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdateWorkoutInput) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Upload any new images first
+      let newUrls: string[] = [];
+      if (input.newImages.length > 0) {
+        newUrls = await uploadMultipleImages(user.id, input.newImages);
+      }
+      const finalImageUrls = [...input.keptImageUrls, ...newUrls];
+
+      // Update the workout (RLS ensures only owner can update)
+      const { error: workoutError } = await supabase
+        .from('workouts')
+        .update({
+          title: input.title,
+          description: input.description,
+          duration_minutes: input.durationMinutes,
+          image_urls: finalImageUrls,
+        })
+        .eq('id', input.workoutId)
+        .eq('user_id', user.id);
+
+      if (workoutError) throw workoutError;
+
+      // Re-evaluate is_qualified for all associated group_workouts if duration changed
+      const { data: groupWorkouts } = await supabase
+        .from('group_workouts')
+        .select('id, groups(min_workout_minutes_to_qualify)')
+        .eq('workout_id', input.workoutId);
+
+      if (groupWorkouts && groupWorkouts.length > 0) {
+        await Promise.all(
+          groupWorkouts.map((gw) =>
+            supabase
+              .from('group_workouts')
+              .update({
+                is_qualified:
+                  input.durationMinutes >=
+                  (gw.groups?.min_workout_minutes_to_qualify ?? 0),
+              })
+              .eq('id', gw.id),
+          ),
+        );
+      }
+
+      return { imageUrls: finalImageUrls };
+    },
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workout'] });
+      queryClient.invalidateQueries({ queryKey: ['compliance'] });
+    },
+  });
+}
+
+export function useDeleteWorkout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (workoutId: string) => {
+      const { error } = await supabase
+        .from('workouts')
+        .delete()
+        .eq('id', workoutId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['compliance'] });
+    },
+  });
+}
+
 type WorkoutInput = {
   groupIds: string[];
   durationMinutes: number;
@@ -99,13 +190,14 @@ export function useGroupWorkouts(groupId: string) {
 
 export type FeedWorkout = {
   id: string;
+  user_id: string;
   duration_minutes: number;
   title: string;
   description: string | null;
   image_urls: string[];
   created_at: string;
   is_qualified: boolean;
-  groupName: string;
+  groupNames: string[];
   profiles: {
     username: string;
     display_name: string | null;
@@ -132,17 +224,39 @@ export function useFeedWorkouts() {
 
       if (groupError) throw groupError;
 
-      const groupFeed = (groupData ?? []).map((row) => ({
-        id: row.workouts!.id,
-        duration_minutes: row.workouts!.duration_minutes,
-        title: row.workouts!.title,
-        description: row.workouts!.description,
-        image_urls: row.workouts!.image_urls ?? [],
-        created_at: row.workouts!.created_at,
-        is_qualified: row.is_qualified,
-        groupName: row.groups?.name ?? '',
-        profiles: row.workouts!.profiles,
-      }));
+      // Aggregate by workout ID — collect all group names the viewer has access to onto one card.
+      // RLS ensures only groups the viewer is a member of are returned, so privacy is handled automatically.
+      const groupFeedMap = (groupData ?? []).reduce<Map<string, FeedWorkout>>(
+        (acc, row) => {
+          const workoutId = row.workouts!.id;
+          const groupName = row.groups?.name;
+          const existing = acc.get(workoutId);
+
+          if (existing) {
+            if (groupName && !existing.groupNames.includes(groupName)) {
+              existing.groupNames.push(groupName);
+            }
+            if (row.is_qualified) existing.is_qualified = true;
+          } else {
+            acc.set(workoutId, {
+              id: workoutId,
+              user_id: row.workouts!.user_id,
+              duration_minutes: row.workouts!.duration_minutes,
+              title: row.workouts!.title,
+              description: row.workouts!.description,
+              image_urls: row.workouts!.image_urls ?? [],
+              created_at: row.workouts!.created_at,
+              is_qualified: row.is_qualified,
+              groupNames: groupName ? [groupName] : [],
+              profiles: row.workouts!.profiles,
+            });
+          }
+          return acc;
+        },
+        new Map(),
+      );
+
+      const groupFeed = Array.from(groupFeedMap.values());
 
       // Fetch user's own workouts not posted to any group
       const groupWorkoutIds = new Set(groupFeed.map((w) => w.id));
@@ -159,13 +273,14 @@ export function useFeedWorkouts() {
         .filter((w) => !groupWorkoutIds.has(w.id))
         .map((w) => ({
           id: w.id,
+          user_id: w.user_id,
           duration_minutes: w.duration_minutes,
           title: w.title,
           description: w.description,
           image_urls: w.image_urls ?? [],
           created_at: w.created_at,
           is_qualified: false,
-          groupName: '',
+          groupNames: [],
           profiles: w.profiles,
         }));
 
@@ -203,13 +318,14 @@ export function useMyWorkouts(limit?: number) {
         const firstGw = row.group_workouts?.[0];
         return {
           id: row.id,
+          user_id: row.user_id,
           duration_minutes: row.duration_minutes,
           title: row.title,
           description: row.description,
           image_urls: row.image_urls ?? [],
           created_at: row.created_at,
           is_qualified: firstGw?.is_qualified ?? false,
-          groupName: firstGw?.groups?.name ?? '',
+          groupNames: firstGw?.groups?.name ? [firstGw.groups.name] : [],
           profiles: null,
         } satisfies FeedWorkout;
       });

@@ -82,10 +82,10 @@ export function Button({
     borderColor: interpolateColor(
       glowProgress.value,
       [0, 1],
-      [borderRestColors[variant], '#6c73e8'],
+      [borderRestColors[variant], '#9098f5'],
     ),
-    shadowOpacity: glowProgress.value * 0.85,
-    shadowRadius: 6 + glowProgress.value * 14,
+    shadowOpacity: glowProgress.value,
+    shadowRadius: 6 + glowProgress.value * 34,
   }));
 
   return (
