@@ -1,6 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 
@@ -37,6 +44,7 @@ export default function GroupSettingsScreen() {
   const [minWorkouts, setMinWorkouts] = useState('');
   const [minMinutes, setMinMinutes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (group) {
@@ -138,7 +146,62 @@ export default function GroupSettingsScreen() {
         />
 
         {isAdmin && (
-          <Button title="Save Changes" loading={saving} onPress={handleSave} />
+          <>
+            <Button
+              title="Save Changes"
+              loading={saving}
+              onPress={handleSave}
+            />
+
+            <Pressable
+              onPress={() => {
+                Alert.alert(
+                  'Delete Group?',
+                  'This will permanently delete the group and remove all members. This cannot be undone.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Delete',
+                      style: 'destructive',
+                      onPress: async () => {
+                        setDeleting(true);
+                        try {
+                          const { error } = await supabase
+                            .from('groups')
+                            .delete()
+                            .eq('id', id);
+                          if (error) throw error;
+                          queryClient.invalidateQueries({
+                            queryKey: ['groups'],
+                          });
+                          queryClient.invalidateQueries({
+                            queryKey: ['group', id],
+                          });
+                          router.replace('/(tabs)/groups');
+                        } catch (err) {
+                          Alert.alert(
+                            'Error',
+                            err instanceof Error
+                              ? err.message
+                              : 'Failed to delete group.',
+                          );
+                        } finally {
+                          setDeleting(false);
+                        }
+                      },
+                    },
+                  ],
+                );
+              }}
+              disabled={deleting}
+              className="mt-10 items-center py-3"
+              hitSlop={8}
+            >
+              <Text className="text-base font-medium text-red-500">
+                {deleting ? 'Deleting…' : 'Delete Group'}
+              </Text>
+            </Pressable>
+          </>
         )}
       </ScrollView>
     </>
