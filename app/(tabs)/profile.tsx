@@ -88,9 +88,10 @@ export default function ProfileScreen() {
     enabled: !!user,
   });
 
-  const { data: groups } = useMyGroups();
-  const { data: workouts } = useMyWorkouts();
-  const { data: stats } = useUserStats();
+  const { data: groups, isLoading: groupsLoading } = useMyGroups();
+  const { data: workouts, isLoading: workoutsLoading } = useMyWorkouts();
+  const { data: stats, isLoading: statsLoading } = useUserStats();
+  const profileLoading = !profile && !!user;
 
   const handleStartEditing = () => {
     setDisplayName(profile?.display_name ?? '');
@@ -260,13 +261,19 @@ export default function ProfileScreen() {
               />
             </View>
           </View>
+        ) : profileLoading ? (
+          <View className="items-center gap-2">
+            <Skeleton width={160} height={24} />
+            <Skeleton width={100} height={16} />
+            <Skeleton width={180} height={14} />
+          </View>
         ) : (
           <>
             <Text className="text-xl font-bold text-forge-text">
-              {profile?.display_name ?? profile?.username ?? 'Loading...'}
+              {profile?.display_name ?? profile?.username ?? ''}
             </Text>
             <Text className="text-sm text-forge-muted">
-              @{profile?.username ?? '...'}
+              @{profile?.username ?? ''}
             </Text>
             <Text className="mt-1 text-xs text-forge-muted">{user?.email}</Text>
             {memberSince && (
@@ -285,11 +292,19 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      {stats && stats.totalWorkouts > 0 && (
-        <View className="mb-6">
-          <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
-            Stats
-          </Text>
+      <View className="mb-6">
+        <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
+          Stats
+        </Text>
+        {statsLoading ? (
+          <View className="flex-row flex-wrap gap-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <View key={i} className="min-w-[22%] flex-1">
+                <Skeleton height={64} />
+              </View>
+            ))}
+          </View>
+        ) : stats && stats.totalWorkouts > 0 ? (
           <View className="flex-row flex-wrap gap-2">
             <StatTile label="Workouts" value={stats.totalWorkouts} />
             <StatTile
@@ -303,15 +318,24 @@ export default function ProfileScreen() {
             <StatTile label="Streak" value={`${stats.currentStreak}w`} />
             <StatTile label="Best streak" value={`${stats.bestStreak}w`} />
           </View>
-        </View>
-      )}
-
-      {groups && groups.length > 0 && (
-        <View className="mb-6">
-          <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
-            Groups
+        ) : (
+          <Text className="text-sm text-forge-muted">
+            No workouts logged yet.
           </Text>
-          {groups.map((group) => (
+        )}
+      </View>
+
+      <View className="mb-6">
+        <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
+          Groups
+        </Text>
+        {groupsLoading ? (
+          <View className="gap-2">
+            <Skeleton height={44} />
+            <Skeleton height={44} />
+          </View>
+        ) : groups && groups.length > 0 ? (
+          groups.map((group) => (
             <Link key={group.id} href={`/group/${group.id}`} asChild>
               <Pressable className="mb-2 rounded-lg border border-forge-border bg-forge-surface p-3 active:opacity-70">
                 <Text className="font-medium text-forge-text">
@@ -319,9 +343,13 @@ export default function ProfileScreen() {
                 </Text>
               </Pressable>
             </Link>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <Text className="text-sm text-forge-muted">
+            Not in any groups yet.
+          </Text>
+        )}
+      </View>
 
       <View className="mb-6">
         <Text className="mb-3 text-xs uppercase tracking-[2px] text-forge-muted">
@@ -389,11 +417,9 @@ export default function ProfileScreen() {
         className="mb-6"
       />
 
-      {workouts && workouts.length > 0 && (
-        <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
-          Your Workouts
-        </Text>
-      )}
+      <Text className="mb-2 text-xs uppercase tracking-[2px] text-forge-muted">
+        Your Workouts
+      </Text>
     </View>
   );
 
@@ -403,13 +429,21 @@ export default function ProfileScreen() {
         className="flex-1 bg-forge-bg"
         contentContainerClassName="px-4"
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-        data={workouts ?? []}
+        data={workoutsLoading ? [] : (workouts ?? [])}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={profileHeader}
         ListEmptyComponent={
-          <View className="items-center py-8">
-            <Text className="text-forge-muted">No workouts yet</Text>
-          </View>
+          workoutsLoading ? (
+            <View className="gap-3 px-4">
+              <Skeleton height={120} />
+              <Skeleton height={120} />
+              <Skeleton height={120} />
+            </View>
+          ) : (
+            <View className="items-center py-8">
+              <Text className="text-forge-muted">No workouts yet</Text>
+            </View>
+          )
         }
         renderItem={({ item }: { item: FeedWorkout }) => (
           <WorkoutCard workout={item} onEdit={() => setEditingWorkout(item)} />
@@ -431,5 +465,11 @@ function StatTile({ label, value }: { label: string; value: string | number }) {
       <Text className="text-lg font-bold text-primary">{value}</Text>
       <Text className="text-xs text-forge-muted">{label}</Text>
     </View>
+  );
+}
+
+function Skeleton({ width, height }: { width?: number; height: number }) {
+  return (
+    <View className="rounded-lg bg-forge-elevated" style={{ width, height }} />
   );
 }

@@ -19,28 +19,28 @@ interface ButtonProps extends Omit<PressableProps, 'children'> {
 const bgColors: Record<ButtonVariant, string> = {
   primary: '#454dcc',
   outline: 'transparent',
-  danger: 'transparent',
+  danger: '#ef4444',
   ghost: 'transparent',
 };
 
 const bgPressedColors: Record<ButtonVariant, string> = {
   primary: '#373ea3',
   outline: 'rgba(69,77,204,0.10)',
-  danger: 'rgba(69,77,204,0.10)',
+  danger: '#dc2626',
   ghost: 'transparent',
 };
 
 const borderRestColors: Record<ButtonVariant, string> = {
   primary: '#454dcc',
   outline: '#454dcc',
-  danger: 'rgba(69,77,204,0.60)',
+  danger: '#ef4444',
   ghost: 'transparent',
 };
 
 const textColors: Record<ButtonVariant, string> = {
   primary: '#ffffff',
   outline: '#454dcc',
-  danger: '#454dcc',
+  danger: '#ffffff',
   ghost: '#A1A1AA',
 };
 
@@ -73,6 +73,8 @@ export function Button({
   const glowProgress = useSharedValue(0);
 
   // Single progress value drives border color, background, and shadow halo simultaneously.
+  const glowPeakColor = variant === 'danger' ? '#f87171' : '#9098f5';
+
   const glowStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       glowProgress.value,
@@ -82,11 +84,13 @@ export function Button({
     borderColor: interpolateColor(
       glowProgress.value,
       [0, 1],
-      [borderRestColors[variant], '#9098f5'],
+      [borderRestColors[variant], glowPeakColor],
     ),
     shadowOpacity: glowProgress.value,
     shadowRadius: 6 + glowProgress.value * 34,
   }));
+
+  const shadowColor = variant === 'danger' ? '#ef4444' : '#454dcc';
 
   return (
     <Pressable
@@ -105,6 +109,7 @@ export function Button({
       <Animated.View
         style={[
           styles.base,
+          { shadowColor },
           glowStyle,
           {
             paddingVertical: paddingV[size],
