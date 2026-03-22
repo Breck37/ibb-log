@@ -12,7 +12,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Forge } from '@/constants/Colors';
 import { Button } from '@/components/ui/Button';
-import { EditWorkoutModal, type EditableWorkout } from '@/components/EditWorkoutModal';
+import {
+  EditWorkoutModal,
+  type EditableWorkout,
+} from '@/components/EditWorkoutModal';
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useFeedWorkouts } from '@/lib/hooks/use-workouts';
 import { useAuth } from '@/providers/auth-provider';
@@ -52,7 +55,9 @@ export default function FeedScreen() {
   const { data: workouts, isLoading, error } = useFeedWorkouts();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(null);
+  const [editingWorkout, setEditingWorkout] = useState<EditableWorkout | null>(
+    null,
+  );
 
   if (isLoading) {
     return (
@@ -76,7 +81,7 @@ export default function FeedScreen() {
     <View className="flex-1 bg-forge-bg">
       <FlatList
         data={workouts}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         contentContainerClassName="px-4"
         ListEmptyComponent={
