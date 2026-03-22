@@ -9,7 +9,7 @@ Everything that must be done before IBB Log can be submitted to the App Store. W
 These must ship before any production build.
 
 - [x] Remove debug `console.log` statements (`lib/hooks/use-groups.ts`) — PR #64
-- [ ] Fix posts being duplicated
+- [x] Fix posts being duplicated — PR #43
 - [ ] Fix header titles / duplicate screen titles
 - [ ] Fix settings icon overlap
 - [ ] Fix profile loading states
@@ -181,3 +181,4 @@ Once TestFlight testing is stable:
 - EAS build + submit pipeline — configured
 - OTA update channel (`production`) — configured
 - Deep link / invite flow — implemented
+- Transactional email via Resend SMTP (`noreply@ibb-log.com`) — configured

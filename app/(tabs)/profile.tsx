@@ -1,4 +1,5 @@
 import { Button, Input } from '@/components/ui/';
+import { BuildInfoButton } from '@/components/BuildInfoButton';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
 import { Camera, User } from 'phosphor-react-native';
@@ -375,6 +376,10 @@ export default function ProfileScreen() {
             </View>
           )}
         </View>
+      </View>
+
+      <View className="mb-4 border-t border-forge-border pt-1">
+        <BuildInfoButton variant="inline" />
       </View>
 
       <Button

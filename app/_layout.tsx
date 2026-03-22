@@ -12,7 +12,6 @@ import { useColorScheme, View } from 'react-native';
 import 'react-native-reanimated';
 
 import { BiometricLockScreen } from '@/components/BiometricLockScreen';
-import { BuildInfoButton } from '@/components/BuildInfoButton';
 import { darkTheme, lightTheme } from '@/constants/Colors';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import {
@@ -45,7 +44,7 @@ function AppShell({
       className="flex-1"
     >
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
+        <Stack screenOptions={{ headerBackTitle: 'Back' }}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
@@ -56,7 +55,7 @@ function AppShell({
             name="workout/[id]"
             options={{ title: 'Workout Details' }}
           />
-          <Stack.Screen name="group/[id]" options={{ title: 'Group' }} />
+          <Stack.Screen name="group/[id]" options={{ title: '' }} />
           <Stack.Screen
             name="group/create"
             options={{ title: 'Create Group', presentation: 'modal' }}
@@ -72,7 +71,6 @@ function AppShell({
         </Stack>
       </ThemeProvider>
       {isLocked && <BiometricLockScreen />}
-      {user && <BuildInfoButton />}
     </View>
   );
 }
