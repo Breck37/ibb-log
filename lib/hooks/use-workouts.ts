@@ -78,6 +78,25 @@ export function useUpdateWorkout() {
   });
 }
 
+export function useDeleteWorkout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (workoutId: string) => {
+      const { error } = await supabase
+        .from('workouts')
+        .delete()
+        .eq('id', workoutId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['group-workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['compliance'] });
+    },
+  });
+}
+
 type WorkoutInput = {
   groupIds: string[];
   durationMinutes: number;

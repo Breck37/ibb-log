@@ -53,13 +53,16 @@ export function WorkoutCard({ workout, onEdit }: WorkoutCardProps) {
           <Text className="font-semibold text-forge-text">{displayName}</Text>
           <Text className="text-xs text-forge-muted">{timeAgo}</Text>
         </View>
-        {workout.groupNames.length > 0 ? (
-          <View className="mr-2 rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1">
+        {workout.groupNames.map((name) => (
+          <View
+            key={name}
+            className="mr-1 rounded border border-forge-secondary/40 bg-forge-secondary/10 px-2.5 py-1"
+          >
             <Text className="text-xs font-medium text-forge-secondary-text">
-              {workout.groupNames.join(' · ')}
+              {name}
             </Text>
           </View>
-        ) : null}
+        ))}
         {workout.is_qualified && (
           <View className="rounded border border-primary/40 bg-primary/10 px-2 py-1">
             <Text className="text-xs font-medium text-primary">Qualified</Text>

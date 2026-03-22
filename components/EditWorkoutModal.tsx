@@ -16,7 +16,7 @@ import {
 
 import { Forge } from '@/constants/Colors';
 import { Input } from '@/components/ui/Input';
-import { useUpdateWorkout } from '@/lib/hooks/use-workouts';
+import { useDeleteWorkout, useUpdateWorkout } from '@/lib/hooks/use-workouts';
 import { pickImages } from '@/lib/services/image-upload';
 
 // Set to a number (e.g. 24) to enable time-based editing cutoff, or null for no limit.
@@ -50,6 +50,7 @@ function isWithinEditWindow(createdAt: string): boolean {
 
 export function EditWorkoutModal({ workout, visible, onClose }: Props) {
   const updateWorkout = useUpdateWorkout();
+  const deleteWorkout = useDeleteWorkout();
 
   const [duration, setDuration] = useState('');
   const [title, setTitle] = useState('');
@@ -110,7 +111,10 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
       setNewImages([]);
       isDirtyRef.current = false;
       setSaveStatus('saved');
-      setTimeout(() => setSaveStatus((s) => (s === 'saved' ? 'idle' : s)), 2000);
+      setTimeout(
+        () => setSaveStatus((s) => (s === 'saved' ? 'idle' : s)),
+        2000,
+      );
     } catch {
       setSaveStatus('error');
     }
@@ -186,6 +190,22 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
     }
   };
 
+  const handleDelete = () => {
+    if (!workout) return;
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    Alert.alert('Delete workout?', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteWorkout.mutateAsync(workout.id);
+          onClose();
+        },
+      },
+    ]);
+  };
+
   if (!workout) return null;
 
   const editable = isWithinEditWindow(workout.created_at);
@@ -218,6 +238,9 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
         <View className="flex-row items-center border-b border-forge-border px-4 py-3">
           <Pressable onPress={handleCancel} hitSlop={8} className="py-1 pr-4">
             <Text className="text-forge-muted">Cancel</Text>
+          </Pressable>
+          <Pressable onPress={handleDelete} hitSlop={8} className="py-1 pr-4">
+            <Text className="text-red-500">Delete</Text>
           </Pressable>
 
           <View className="flex-1 items-center">
