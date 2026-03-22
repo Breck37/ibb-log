@@ -11,12 +11,24 @@
     "preview": {
       "distribution": "internal"
     },
+    "testflight": {
+      "autoIncrement": true,
+      "channel": "preview",
+      "distribution": "store"
+    },
     "production": {
       "autoIncrement": true,
       "channel": "production"
     }
   },
   "submit": {
+    "testflight": {
+      "ios": {
+        "appleId": "brent.eckert7@gmail.com",
+        "ascAppId": "6759132831",
+        "appleTeamId": "4344ZG274C"
+      }
+    },
     "production": {
       "ios": {
         "appleId": "brent.eckert7@gmail.com",

@@ -16,6 +16,8 @@
     "build:preview:android": "eas build --profile preview --platform android",
     "build:prod:ios": "eas build --profile production --platform ios",
     "build:prod:android": "eas build --profile production --platform android",
+    "build:testflight:ios": "eas build --profile testflight --platform ios",
+    "submit:testflight:ios": "eas submit --platform ios --profile testflight",
     "submit:ios": "eas submit --platform ios --profile production",
     "ota:preview": "eas update --channel preview --message",
     "ota:prod": "eas update --channel production --message",
