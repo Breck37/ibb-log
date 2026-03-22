@@ -1,6 +1,7 @@
 import { Gear, ShareNetwork, User } from 'phosphor-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useAuth } from '@/providers/auth-provider';
 import {
   ActivityIndicator,
   Alert,
@@ -70,6 +71,7 @@ function InviteButton({ onPress }: { onPress: () => void }) {
 export default function GroupDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { user } = useAuth();
 
   const { data: group, isLoading } = useQuery({
     queryKey: ['group', id],
@@ -86,6 +88,9 @@ export default function GroupDetailScreen() {
   });
 
   const { data: members } = useGroupMembers(id);
+
+  const currentMember = members?.find((m) => m.user_id === user?.id);
+  const isAdmin = currentMember?.role === 'admin';
 
   const handleShareInvite = async () => {
     if (!group) return;
@@ -122,9 +127,15 @@ export default function GroupDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: group.name,
+          title: '',
           headerRight: () => (
-            <Link href="/group/settings" asChild>
+            <Link
+              href={{
+                pathname: '/group/settings',
+                params: { id, isAdmin: isAdmin ? '1' : '0' },
+              }}
+              asChild
+            >
               <Pressable className="p-2">
                 <Gear size={20} color="#A1A1AA" weight="regular" />
               </Pressable>

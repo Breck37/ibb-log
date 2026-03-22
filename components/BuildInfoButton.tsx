@@ -7,14 +7,29 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const version = Constants.expoConfig?.version ?? '—';
 const env = __DEV__ ? 'Development' : 'Production';
 
-/** Floating gear icon that opens a build-info sheet. Drop anywhere as an
- *  absolute-positioned overlay on auth screens. */
-export function BuildInfoButton() {
+type Props = {
+  /** 'floating' renders an absolute-positioned gear overlay (default, for auth screens).
+   *  'inline' renders a tappable settings row (for embedding in a list/scroll view). */
+  variant?: 'floating' | 'inline';
+};
+
+export function BuildInfoButton({ variant = 'floating' }: Props) {
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
 
-  return (
-    <>
+  const trigger =
+    variant === 'inline' ? (
+      <Pressable
+        className="flex-row items-center justify-between py-3"
+        onPress={() => setVisible(true)}
+        hitSlop={8}
+      >
+        <Text className="text-sm text-forge-muted">Build Info</Text>
+        <Text className="text-sm font-semibold text-forge-text">
+          v{version}
+        </Text>
+      </Pressable>
+    ) : (
       <Pressable
         className="absolute right-6 z-10 p-1"
         style={{ top: insets.top + 12 }}
@@ -23,6 +38,11 @@ export function BuildInfoButton() {
       >
         <Gear size={20} color="#A1A1AA" weight="regular" />
       </Pressable>
+    );
+
+  return (
+    <>
+      {trigger}
 
       <Modal
         visible={visible}
