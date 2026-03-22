@@ -70,7 +70,7 @@ export function useUpdateWorkout() {
       return { imageUrls: finalImageUrls };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      queryClient.refetchQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['group-workouts'] });
       queryClient.invalidateQueries({ queryKey: ['group-workout'] });
       queryClient.invalidateQueries({ queryKey: ['compliance'] });
