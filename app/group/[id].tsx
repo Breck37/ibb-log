@@ -1,6 +1,7 @@
 import { Gear, ShareNetwork, User } from 'phosphor-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { useAuth } from '@/providers/auth-provider';
 import {
   ActivityIndicator,
@@ -92,6 +93,12 @@ export default function GroupDetailScreen() {
   const currentMember = members?.find((m) => m.user_id === user?.id);
   const isAdmin = currentMember?.role === 'admin';
 
+  useEffect(() => {
+    if (!isLoading && !group) {
+      router.replace('/(tabs)/groups');
+    }
+  }, [isLoading, group]);
+
   const handleShareInvite = async () => {
     if (!group) return;
     const deepLink = `ibblog://group/join?code=${group.invite_code}`;
@@ -118,10 +125,7 @@ export default function GroupDetailScreen() {
     );
   }
 
-  if (!group && !isLoading) {
-    router.replace('/(tabs)/groups');
-    return null;
-  }
+  if (!group) return null;
 
   return (
     <>
