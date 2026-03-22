@@ -10,10 +10,10 @@ These must ship before any production build.
 
 - [x] Remove debug `console.log` statements (`lib/hooks/use-groups.ts`) — PR #64
 - [x] Fix posts being duplicated — PR #43
-- [ ] Fix header titles / duplicate screen titles
-- [ ] Fix settings icon overlap
+- [x] Fix header titles / back button showing "(tabs)" — PR #67
+- [x] Fix settings icon overlap — moved BuildInfoButton to Profile screen — PR #67
+- [x] Group Settings screen — implemented with admin edit / member view-only, delete group action — PR #67
 - [ ] Fix profile loading states
-- [ ] Group Settings screen — implement basic settings or remove navigation to it (currently shows "coming soon" placeholder)
 
 ---
 
