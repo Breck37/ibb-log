@@ -76,8 +76,8 @@ export default function GroupSettingsScreen() {
 
       if (error) throw error;
 
-      queryClient.invalidateQueries({ queryKey: ['group', id] });
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
+      await queryClient.refetchQueries({ queryKey: ['group', id] });
+      await queryClient.refetchQueries({ queryKey: ['groups'] });
       router.back();
     } catch (err) {
       Alert.alert(
@@ -171,11 +171,11 @@ export default function GroupSettingsScreen() {
                             .delete()
                             .eq('id', id);
                           if (error) throw error;
-                          queryClient.invalidateQueries({
-                            queryKey: ['groups'],
-                          });
-                          queryClient.invalidateQueries({
+                          queryClient.removeQueries({
                             queryKey: ['group', id],
+                          });
+                          await queryClient.refetchQueries({
+                            queryKey: ['groups'],
                           });
                           router.replace('/(tabs)/groups');
                         } catch (err) {
