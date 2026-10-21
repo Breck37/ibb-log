@@ -6,9 +6,18 @@ Features are ordered by recommended implementation sequence (dependencies flow d
 
 ---
 
-## 1. Push Notifications Infrastructure
+## 1. Push Notifications Infrastructure — ✅ DONE
 
 **Priority**: High (blocks weekly reports, achievements, and other notification features)
+
+> **Status**: implemented. Token registration, permission handling, tap routing, and
+> server-side delivery are all in place. See `docs/PUSH_NOTIFICATIONS.md`.
+>
+> One deliberate deviation from the plan below: tokens live in a dedicated
+> `push_tokens` table, **not** a `push_token` column on `profiles`. `profiles` has an
+> "Anyone can view profiles" RLS policy, and an Expo push token is a bearer credential
+> — a column there would let any signed-in user push to any other user's device. The
+> separate table is owner-only and also supports multiple devices per user.
 
 ### Context
 
@@ -236,9 +245,13 @@ Every Monday morning, each group's members receive a push notification summarizi
 
 ---
 
-## 7. Workout Post Notifications
+## 7. Workout Post Notifications — ✅ DONE
 
 **Priority**: Medium (depends on #1 Push Notifications)
+
+> **Status**: implemented as `supabase/functions/notify-workout/`, invoked from
+> `useCreateWorkout` after a successful post. Dedupes recipients across shared groups
+> and prunes dead tokens. Still needs deploying to the Supabase project.
 
 ### Context
 

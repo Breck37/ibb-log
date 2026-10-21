@@ -10,10 +10,14 @@ These must ship before any production build.
 
 - [x] Remove debug `console.log` statements (`lib/hooks/use-groups.ts`) — PR #64
 - [x] Fix posts being duplicated — PR #43
-- [ ] Fix header titles / duplicate screen titles
-- [ ] Fix settings icon overlap
-- [ ] Fix profile loading states
-- [ ] Group Settings screen — implement basic settings or remove navigation to it (currently shows "coming soon" placeholder)
+- [x] Fix header titles / duplicate screen titles — PR #67
+- [x] Fix settings icon overlap — PR #67
+- [x] Fix profile loading states — PR #68
+- [x] Group Settings screen — implemented (edit name, weekly minimums, admin delete) — PR #67
+- [x] Fix crash on the workout detail screen (`FontAwesome` used but never imported)
+- [x] Fix crash on the biometric lock screen (`ScanFace` isn't a phosphor v3 icon)
+- [x] Add `typecheck` + `lint` jobs to CI — both bugs above were visible to `tsc` and
+      `eslint` but CI only ran `format:check` and (zero) tests
 
 ---
 
@@ -100,19 +104,21 @@ Apple requires screenshots for every device size you claim to support. Minimum: 
 
 Push notifications are a core feature (weekly reports, achievement milestones, chat). The APNs key from Phase 4 is a prerequisite.
 
-- [ ] `expo-notifications` is already installed — wire up token registration in the app
-- [ ] Store push tokens per user in Supabase on sign-in
-- [ ] Add `expo-notifications` plugin to `app.json` (the plugin sets the `aps-environment` entitlement automatically):
-
-  ```json
-  [
-    "expo-notifications",
-    { "icon": "./assets/images/notification-icon.png", "color": "#ffffff" }
-  ]
-  ```
-
-- [ ] Test that a push notification can be sent and received on a physical device
+- [x] Wire up token registration in the app — `providers/notification-provider.tsx`
+- [x] Store push tokens per user in Supabase on sign-in — `push_tokens` table (migration 00005)
+- [x] Add the `expo-notifications` plugin to `app.json` (the plugin sets the
+      `aps-environment` entitlement automatically)
+- [x] Handle notification taps → deep link to the workout/group — `lib/hooks/use-notifications.ts`
+- [x] Send a notification when a workout is posted to a group —
+      `supabase/functions/notify-workout/`
+- [ ] Deploy the Edge Function: `npx supabase functions deploy notify-workout --project-ref <ref>`
 - [ ] Upload APNs key to EAS: `eas credentials`
+- [ ] Test that a push notification can be sent and received on a **physical device**
+      (simulators never get a push token)
+- [ ] Optional: add `assets/images/notification-icon.png` and the plugin's `icon` option
+      — Android-only, so not needed while the app is iOS-only
+
+See `docs/PUSH_NOTIFICATIONS.md` for the architecture and how to test it.
 
 ---
 

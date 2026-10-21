@@ -11,6 +11,7 @@ import {
   type PropsWithChildren,
 } from 'react';
 
+import { removePushToken } from '@/lib/services/push-notifications';
 import { supabase } from '@/lib/supabase';
 
 // Module-level variable — synchronous reads/writes, no React render cycle dependency.
@@ -197,6 +198,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   const signOut = async () => {
+    // Must happen first: deleting the row needs an authenticated session, and we
+    // don't want this device still receiving the previous user's notifications.
+    await removePushToken();
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };

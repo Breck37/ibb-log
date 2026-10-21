@@ -13,11 +13,12 @@ import 'react-native-reanimated';
 
 import { BiometricLockScreen } from '@/components/BiometricLockScreen';
 import { darkTheme, lightTheme } from '@/constants/Colors';
-import { AuthProvider, useAuth } from '@/providers/auth-provider';
+import { AuthProvider } from '@/providers/auth-provider';
 import {
   BiometricProvider,
   useBiometric,
 } from '@/providers/biometric-provider';
+import { NotificationProvider } from '@/providers/notification-provider';
 import '../global.css';
 
 export { ErrorBoundary } from 'expo-router';
@@ -36,7 +37,6 @@ function AppShell({
   colorScheme: 'light' | 'dark' | null | undefined;
 }) {
   const { isLocked } = useBiometric();
-  const { user } = useAuth();
 
   return (
     <View
@@ -98,9 +98,11 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BiometricProvider>
-          <AppShell colorScheme={colorScheme} />
-        </BiometricProvider>
+        <NotificationProvider>
+          <BiometricProvider>
+            <AppShell colorScheme={colorScheme} />
+          </BiometricProvider>
+        </NotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

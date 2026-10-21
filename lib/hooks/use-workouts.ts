@@ -159,6 +159,18 @@ export function useCreateWorkout() {
           .insert(groupWorkoutRows);
 
         if (gwError) throw gwError;
+
+        // Fan out push notifications to the other group members. Fire-and-forget:
+        // the workout is already saved, so a push failure must not fail the post.
+        // `invoke` resolves with an `error` field instead of rejecting, so check both.
+        supabase.functions
+          .invoke('notify-workout', { body: { workoutId: workout.id } })
+          .then(({ error }) => {
+            if (error) console.warn('[push] notify-workout failed:', error);
+          })
+          .catch((error) => {
+            console.warn('[push] notify-workout unreachable:', error);
+          });
       }
 
       return workout;
