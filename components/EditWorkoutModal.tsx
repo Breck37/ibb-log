@@ -11,10 +11,11 @@ import {
   Pressable,
   ScrollView,
   Text,
+  useColorScheme,
   View,
 } from 'react-native';
 
-import { Forge } from '@/constants/Colors';
+import { Forge, forgePalette } from '@/constants/Colors';
 import { Input } from '@/components/ui/Input';
 import { useDeleteWorkout, useUpdateWorkout } from '@/lib/hooks/use-workouts';
 import { pickImages } from '@/lib/services/image-upload';
@@ -59,11 +60,15 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
   const [newImages, setNewImages] = useState<ImagePickerAsset[]>([]);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
+  const palette = forgePalette[useColorScheme() === 'light' ? 'light' : 'dark'];
+
   const isDirtyRef = useRef(false);
-  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   // Keep a ref to the latest save function so the timer always calls the freshest version
-  const performSaveRef = useRef<() => Promise<void>>();
+  const performSaveRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
   // Populate form when modal opens or workout changes
   useEffect(() => {
@@ -76,6 +81,10 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
       setSaveStatus('idle');
       isDirtyRef.current = false;
     }
+    // Intentionally keyed on workout.id, not the whole workout object: this effect
+    // seeds the form once per opened workout. Depending on `workout` would clobber
+    // the user's in-progress edits every time the query refetches.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workout?.id, visible]);
 
   // Cancel any pending autosave when modal closes
@@ -268,7 +277,7 @@ export function EditWorkoutModal({ workout, visible, onClose }: Props) {
         {/* Body */}
         {!editable ? (
           <View className="flex-1 items-center justify-center p-8">
-            <FontAwesome name="lock" size={32} color={Forge.muted} />
+            <FontAwesome name="lock" size={32} color={palette.muted} />
             <Text className="mt-4 text-center text-forge-muted">
               This workout can no longer be edited.
             </Text>

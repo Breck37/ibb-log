@@ -1,4 +1,4 @@
-import { PaperPlaneTilt, User } from 'phosphor-react-native';
+import { PaperPlaneTilt, PencilSimple, User } from 'phosphor-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -16,6 +16,7 @@ import {
   EditWorkoutModal,
   type EditableWorkout,
 } from '@/components/EditWorkoutModal';
+import { Forge } from '@/constants/Colors';
 import { supabase } from '@/lib/supabase';
 import {
   useAddComment,
@@ -114,7 +115,7 @@ export default function WorkoutDetailScreen() {
                   hitSlop={8}
                   className="px-2"
                 >
-                  <FontAwesome name="pencil" size={16} color="#3b82f6" />
+                  <PencilSimple size={18} color={Forge.primary} />
                 </Pressable>
               )
             : undefined,

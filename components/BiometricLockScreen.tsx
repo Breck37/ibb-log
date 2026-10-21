@@ -1,6 +1,6 @@
 import * as LocalAuthentication from 'expo-local-authentication';
-import { ScanFace, FingerprintSimple } from 'phosphor-react-native';
-import { useEffect, useState } from 'react';
+import { ScanSmiley, FingerprintSimple } from 'phosphor-react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -22,19 +22,7 @@ export function BiometricLockScreen() {
     shadowRadius: 8 + glowProgress.value * 34,
   }));
 
-  useEffect(() => {
-    // Determine auth type for icon
-    LocalAuthentication.supportedAuthenticationTypesAsync().then((types) => {
-      if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
-        setAuthType('fingerprint');
-      }
-    });
-
-    // Auto-trigger on mount
-    triggerUnlock();
-  }, []);
-
-  const triggerUnlock = async () => {
+  const triggerUnlock = useCallback(async () => {
     setFailed(false);
     glowProgress.value = withTiming(1, {
       duration: 400,
@@ -45,9 +33,27 @@ export function BiometricLockScreen() {
       glowProgress.value = withTiming(0, { duration: 300 });
       setFailed(true);
     }
-  };
+  }, [unlock, glowProgress]);
 
-  const Icon = authType === 'fingerprint' ? FingerprintSimple : ScanFace;
+  useEffect(() => {
+    // Determine auth type for icon
+    LocalAuthentication.supportedAuthenticationTypesAsync().then((types) => {
+      if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+        setAuthType('fingerprint');
+      }
+    });
+  }, []);
+
+  // Auto-trigger on mount only — triggerUnlock is stable via useCallback, but we
+  // deliberately do not re-prompt if `unlock` identity ever changes mid-session.
+  const hasPromptedRef = useRef(false);
+  useEffect(() => {
+    if (hasPromptedRef.current) return;
+    hasPromptedRef.current = true;
+    triggerUnlock();
+  }, [triggerUnlock]);
+
+  const Icon = authType === 'fingerprint' ? FingerprintSimple : ScanSmiley;
 
   return (
     <View style={styles.container}>

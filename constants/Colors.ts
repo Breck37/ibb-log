@@ -35,10 +35,12 @@ export const forgePalette = {
   dark: {
     border: '#1E2230',
     placeholder: '#4B5563',
+    muted: '#A1A1AA',
   },
   light: {
     border: '#E5E7EB',
     placeholder: '#9CA3AF',
+    muted: '#6B7280',
   },
 } as const;
 

@@ -97,7 +97,7 @@ export default function GroupDetailScreen() {
     if (!isLoading && !group) {
       router.replace('/(tabs)/groups');
     }
-  }, [isLoading, group]);
+  }, [isLoading, group, router]);
 
   const handleShareInvite = async () => {
     if (!group) return;
